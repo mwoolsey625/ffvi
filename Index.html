@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FFVI Run">
+<meta name="theme-color" content="#0E1733">
+<title>FFVI PR — Perfect Stats + Full Bestiary</title>
+<style>
+:root{
+  --field:#0E1733; --panel:#16224A; --panel2:#1C2A58;
+  --rule:#4C6BB0; --rule-dim:#2B3D6E;
+  --ink:#EEF2FF; --ink-dim:#93A4D4;
+  --magicite:#B98CE8; --sealed:#54BE9A; --warn:#E8B15C;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--field)}
+body{
+  color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.5;
+  padding:calc(14px + env(safe-area-inset-top)) 12px calc(56px + env(safe-area-inset-bottom));
+  max-width:760px;margin:0 auto;-webkit-text-size-adjust:100%;
+}
+header{border-bottom:1px solid var(--rule);padding-bottom:12px;margin-bottom:14px}
+.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--magicite);margin-bottom:6px}
+h1{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}
+.bar{height:5px;background:var(--rule-dim);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--magicite);width:0;transition:width .35s ease}
+.count{font-size:11px;color:var(--ink-dim);margin-top:6px;letter-spacing:.05em}
+
+nav{display:flex;gap:5px;margin-bottom:16px}
+nav button{
+  flex:1;min-height:40px;padding:9px 2px;background:transparent;color:var(--ink-dim);
+  border:1px solid var(--rule-dim);border-radius:3px;font-family:var(--mono);
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+}
+nav button[aria-selected="true"]{background:var(--panel2);color:var(--ink);border-color:var(--rule)}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);outline-offset:2px}
+
+.phase{margin-bottom:26px}
+.phase-name{font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:3px}
+.phase-note{font-size:11px;color:var(--ink-dim);margin-bottom:12px}
+
+.gate{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel);overflow:hidden}
+.gate.sealed{border-color:var(--sealed);background:var(--field)}
+.gate-head{
+  width:100%;display:flex;align-items:center;gap:9px;padding:12px;min-height:46px;
+  background:transparent;border:0;color:inherit;font-family:var(--mono);font-size:13px;
+  text-align:left;cursor:pointer;
+}
+.chev{color:var(--ink-dim);font-size:10px;width:9px;flex:none}
+.gate-title{flex:1;font-weight:600}
+.gate.sealed .gate-title{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}
+.stamp{font-size:9px;letter-spacing:.16em;padding:2px 6px;border-radius:2px;border:1px solid var(--sealed);color:var(--sealed);flex:none}
+.tally{font-size:10px;color:var(--ink-dim);flex:none;letter-spacing:.06em}
+.gbody{padding:0 12px 12px;border-top:1px solid var(--rule-dim)}
+.seal-line{font-size:10px;color:var(--ink-dim);letter-spacing:.05em;padding:9px 0 2px}
+.seal-line b{color:var(--warn);font-weight:600}
+.warn{font-size:11px;color:var(--warn);border-left:2px solid var(--warn);padding:5px 0 5px 9px;margin:8px 0 4px;line-height:1.45}
+.item{
+  width:100%;display:flex;align-items:flex-start;gap:9px;padding:9px 0;min-height:40px;
+  background:transparent;border:0;border-top:1px solid var(--rule-dim);color:var(--ink);
+  font-family:var(--mono);font-size:12.5px;text-align:left;cursor:pointer;
+}
+.box{width:15px;height:15px;flex:none;margin-top:1px;border:1px solid var(--rule);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--field)}
+.item.on .box{background:var(--sealed);border-color:var(--sealed)}
+.item.on span:last-child{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);
+  font-weight:600;padding:0 8px 7px 0;border-bottom:1px solid var(--rule)}
+td{padding:9px 8px 9px 0;border-bottom:1px solid var(--rule-dim);vertical-align:top}
+.nm{font-weight:600;white-space:nowrap}
+.sub{display:block;font-size:10.5px;color:var(--ink-dim);margin-top:2px;line-height:1.4;white-space:normal}
+.dual{color:var(--magicite);font-weight:700}
+.skip{color:var(--ink-dim)}
+
+.card{border:1px solid var(--rule-dim);border-radius:4px;padding:13px;background:var(--panel);margin-bottom:14px}
+.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);margin:0 0 9px;font-weight:600}
+.p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 8px}
+.p:last-child{margin-bottom:0}
+.p b{color:var(--ink);font-weight:600}
+.seg{padding:8px 12px;min-height:38px;background:transparent;border:1px solid var(--rule-dim);
+  color:var(--ink-dim);font-family:var(--mono);font-size:11px;cursor:pointer;border-radius:3px}
+.seg.on{background:var(--panel2);color:var(--ink);border-color:var(--magicite)}
+.row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.row>span{width:52px;font-size:12px;font-weight:600}
+
+details{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel)}
+summary{padding:12px;cursor:pointer;font-size:13px;font-weight:600;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▶ ";color:var(--ink-dim);font-size:10px}
+details[open] summary::before{content:"▼ "}
+details[open] summary{border-bottom:1px solid var(--rule-dim)}
+.doc{padding:12px;font-size:12.5px;line-height:1.65;color:var(--ink-dim)}
+.doc h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--magicite);margin:16px 0 7px;font-weight:600}
+.doc h4:first-child{margin-top:0}
+.doc p{margin:0 0 9px}
+.doc b{color:var(--ink)}
+.doc ul{margin:0 0 9px;padding-left:17px}
+.doc li{margin-bottom:5px}
+.doc code{background:var(--panel2);padding:1px 5px;border-radius:2px;font-size:11.5px;color:var(--ink)}
+.doc .flag{color:var(--warn)}
+
+.tools{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+.tools button{padding:10px 13px;min-height:40px;background:transparent;border:1px solid var(--rule-dim);
+  color:var(--ink-dim);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;border-radius:3px;cursor:pointer}
+#io{width:100%;margin-top:10px;background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);
+  border-radius:3px;padding:9px;font-family:var(--mono);font-size:11px;min-height:70px;display:none}
+.msg{font-size:11px;color:var(--sealed);margin-top:9px;min-height:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">FFVI Pixel Remaster · Perfect Stats + Full Bestiary</div>
+  <h1>Run Tracker</h1>
+  <div class="bar"><i id="fill"></i></div>
+  <div class="count" id="count">—</div>
+</header>
+
+<nav role="tablist">
+  <button role="tab" data-tab="gates" aria-selected="true">Gates</button>
+  <button role="tab" data-tab="beasts" aria-selected="false">Beasts</button>
+  <button role="tab" data-tab="levels" aria-selected="false">Levels</button>
+  <button role="tab" data-tab="rages" aria-selected="false">Rages</button>
+  <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
+</nav>
+
+<main id="view"></main>
+
+<div class="tools">
+  <button id="export">Back up progress</button>
+  <button id="import">Restore</button>
+  <button id="reset">Clear</button>
+</div>
+<textarea id="io" spellcheck="false" placeholder="Progress code"></textarea>
+<div class="msg" id="msg"></div>
+
+<script>
+"use strict";
+var KEY = "ff6pr-tracker-v1";
+
+var PHASES = [
+ {id:"p1",name:"Phase I — Locked",note:"EXP 0x. Average level 5–6. Every gate below closes behind you.",gates:[
+  {id:"g1",title:"South Figaro Cave",seal:"Entering Returner Hideout",warn:"Simmeh keeps encounters off here. Turn them on.",items:["Foper|11","Hornet|12","Urok|13"]},
+  {id:"g2",title:"Returner Hideout",seal:"Leaving the hideout",warn:"Costs Simmeh's early Genji Glove. The Gauntlet is the missable one.",items:["Say YES to Banon → Gauntlet #1"]},
+  {id:"g3",title:"Locke's Scenario",seal:"Scenario end",warn:"South Figaro Cave swaps its encounter table between treks. These three appear only on the second pass.",items:["Do NOT use the Kutan glitch","Cartagra — second trek|27","Acrophies — second trek|28","Gold Bear — second trek|29"]},
+  {id:"g4",title:"Imperial Camp",seal:"Leaving the camp",warn:"Simmeh calls the Doberman fight a bad trade. Veldt appearance is mandatory.",items:["Kick the first chest → Dobermans","Open the Satellite box|39"]},
+  {id:"g5",title:"Phantom Train",seal:"Leaving the train",warn:"Simmeh routes only Ghost and Oversoul. Clear the whole list.",items:["Ghost|40","Cloud|42","Oversoul|44","Living Dead|46","Angel Whisper|43","Apparition|47","Siegfried|48"]},
+  {id:"g6",title:"Battle of Narshe",seal:"Defeating Kefka",warn:"Must cut through, not dodge. No spell Rages vs Heavy Armor with Celes in party.",items:["Hunting Hound|55","Fidor|53","Heavy Armor|24","Corporal|54","Hell's Rider|286"]},
+  {id:"g7",title:"Opera House",seal:"Stopping the weight",items:["Stunner (fire-weak)|66","Goetia (ice-weak)|67"]},
+  {id:"g8",title:"Imperial Magitek Research Facility",seal:"Meeting Setzer to leave",warn:"CRITICAL: Magna Roader (red) will NOT spawn if Locke, Edgar or Gau is your lead party member. Simmeh's cart party is Locke + Gau + one — you must lead with the third character. There is no Soul Shrine in PR, so there is no second chance.",items:["Sergeant — Factory|76","Proto Armor — Factory|78","Belzecue — Factory|77","Flan — Disposal Pit|80","General — Stairwell|81","Lenergia — Research Facility|83","Destroyer — Research Facility|82","Magna Roader RED — cart (check your lead!)|85","Magna Roader PURPLE — cart|84","Chaser — escape exterior|86","Pipsqueak — escape exterior","Trapper — escape exterior|79","Ifrit magicite (also gates Drain)"]},
+  {id:"g9",title:"Number 128",seal:"Fight end",warn:"~8% per attempt with Thief's Bracer. Budget resets.",items:["Steal Kazekiri #1"]},
+  {id:"g10",title:"Lone Wolf",seal:"Choice made",items:["Save MOG, not Lone Wolf (else lose a Dance)"]},
+  {id:"g11",title:"Cave to the Sealed Gate",seal:"Boarding the ship at Albrook",warn:"BIGGEST CONFLICT. Simmeh says waltz through with encounters off. Override completely.",items:["Antares — first two rooms|90","Lich — first two rooms|91","Provoker — first two rooms|88","Outcast — rest of cave|87","Zombie Dragon — rest of cave|89","Ninja (killing it — use a Vanish setup)","Heiji's Jitte","Kazekiri #2","Ultima Weapon"]},
+  {id:"g12",title:"Vector Banquet",seal:"Banquet end",items:["Fight the Imperial Elite|92"]},
+  {id:"g13",title:"Burning Mansion, Thamasa",seal:"Engaging Flame Eater",items:["Balloon — at least one formation|98"]},
+  {id:"g14",title:"Esper Caves",seal:"Defeating Nelapa",items:["Healing Rod #1"]},
+  {id:"g15",title:"END OF ACT I AUDIT",seal:"Triggering the Floating Continent",warn:"Run the main-menu bestiary Display Map now. Every ? marker above is your last chance.",items:["Bestiary entries #1–112 registered","Boss entries #276–307 registered","Display Map shows no ? in World of Balance"]}
+ ]},
+ {id:"p2",name:"Phase II — Split",note:"After Mog. Stat espers are live. Levels stop being free.",gates:[
+  {id:"g16",title:"Esper Cave leveling",seal:"—",warn:"Gau is dual-stat this run: Zona Seeker now, backfill Bismarck hard afterward.",items:["Gau → level 26, Zona Seeker, EXP 4x","Deposit Gau on the Veldt"]}
+ ]},
+ {id:"p3",name:"Phase III — Unlocked",note:"Real stats. The Floating Continent sweep is now easy.",gates:[
+  {id:"g17",title:"Air Force",seal:"Defeating the main body",warn:"Simmeh's 2x Thundara kill skips Bit entirely. Sources differ on the trigger — quicksave and verify Bit registered.",items:["Destroy Laser Gun ONLY → Bit spawns","Bit defeated + registered","Steal X-Ether #1 from Laser Gun"]},
+  {id:"g18",title:"Floating Continent",seal:"Approaching the Statues",warn:"Level Celes BEFORE ascending — she is force-joined to the escape.",items:["Apokrypha|108","Behemoth|111","Brainpan|106","Dragon|109","Gigantos — monster-in-a-box","Misfit|107","Ninja|112","Platinum Dragon|110","Shadow + Break-caster leveled","Celes leveled"]},
+  {id:"g19",title:"Floating Continent Escape",seal:"Jumping to the Blackjack",warn:"Naude must be KILLED. Imp makes them flee and registers nothing. Six-minute timer.",items:["Naude killed (Fire / Lightning / Holy — not Imp, not instant death)|113","Wait at the jump point for Shadow"]}
+ ]},
+ {id:"p4",name:"World of Ruin",note:"Cyan's Dream is an entirely missable zone. Nine of these live inside it.",gates:[
+  {id:"g20",title:"Collapsing House",seal:"Leaving the house",items:["Healing Rod #2","Zokka|123","Nightwalker|124","Scorpion|125"]},
+  {id:"g21",title:"Angler Whelk",seal:"Fight end",items:["Kill head AND shell simultaneously → 2x Dragon Claw"]},
+  {id:"g22",title:"Owzer's Mansion",seal:"Defeating Chadarnook",items:["Examine the flower painting → Rafflesia"]},
+  {id:"g23",title:"Ancient Castle",seal:"Fleeing Samurai Soul",items:["Do NOT run — loses Master's Scroll AND the entry"]},
+  {id:"g24",title:"Cyan's Dream",seal:"Defeating Wrexsoul",warn:"The whole zone vanishes. All of these go with it.",items:["Weredragon — trippy area|208","Alluring Rider — trippy area|211","Io — Dreamscape Cave|215","Pluto Armor — Dreamscape Cave|210","Schmidt — Dreamscape Cave|209","Pandora — Dreamscape Castle|212","Parasite — Dreamscape Castle|213","Al Jabr — Dreamscape Castle|206","Steal Memento Ring #3 from Wrexsoul"]},
+  {id:"g25",title:"Ragnarok",seal:"Choice made",items:["Choose the SWORD — esper spells available elsewhere"]},
+  {id:"g26",title:"Kefka's Tower",seal:"Final battle",items:["Steal Force Armor #4 from Guardian","Learn Force Field lore from Fiend"]}
+ ]}
+];
+
+var RAGES=[
+ {n:"Stray Cat",g:"Grp 7 · 8",a:"Cat Scratch",w:"Gau's strongest physical Rage — x4 damage, single target",m:1},
+ {n:"Guard Leader",g:"1",a:"Wind Slash",w:"FC approach crowd clear"},
+ {n:"Trillium",g:"4",a:"Bio",w:"Dadaluma, Imperial Elite"},
+ {n:"Ghost",g:"9",a:"Thundara",w:"Serpent Trench, No. 128"},
+ {n:"Oversoul",g:"10",a:"Will o' the Wisp",w:"Kefka, Ifrit/Shiva"},
+ {n:"Aspiran",g:"9 / 11",a:"Gigavolt",w:"Ultros at the Opera"},
+ {n:"Anguiform",g:"11",a:"Aqua Breath",w:"Cranes"},
+ {n:"Gobbledygook",g:"14",a:"Vanish",w:"Number 024"},
+ {n:"Intangir",g:"27",a:"immunities",w:"FC approach"}
+];
+
+var MP={Terra:3,Celes:3,Mog:3,Relm:3,Locke:4,Edgar:4,Shadow:4,Gau:4,Setzer:4,Strago:4,Sabin:5,Cyan:5};
+
+/* Full bestiary, grouped by earliest reachable location, in route order.
+   m:1 = location closes permanently. Source: bover_87 PR guide v1.1 "Best Location". */
+var BEST=[
+{p:"World of Balance",loc:"Narshe",e:[[1,"Guard"],[2,"Silver Lobo"],[3,"Megalodoth"]]},
+{p:"World of Balance",loc:"Narshe Mines",e:[[4,"Wererat"],[5,"Spritzer"],[6,"Bandit"]]},
+{p:"World of Balance",loc:"North Figaro plains / forests",e:[[7,"Leaf Bunny"],[8,"Darkwind"]]},
+{p:"World of Balance",loc:"North Figaro desert",e:[[9,"Sand Ray"],[10,"Alacran"]]},
+{p:"World of Balance",loc:"South Figaro Cave — FIRST trek",m:1,e:[[11,"Foper"],[12,"Hornet"],[13,"Urok"]]},
+{p:"World of Balance",loc:"South Figaro region",e:[[14,"Belmodar"],[15,"Unseelie"],[16,"Mu"]]},
+{p:"World of Balance",loc:"Mt. Kolts",e:[[17,"Zaghrem"],[18,"Trillium"],[19,"Gorgias"],[20,"Cirpius"],[280,"Vargas — boss"],[281,"Ipooh — boss"]]},
+{p:"World of Balance",loc:"Lethe River",e:[[21,"Lesser Lopros"],[22,"Nautiloid"],[23,"Exocite"],[282,"Ultros — boss"]]},
+{p:"World of Balance",loc:"South Figaro — Locke's scenario",m:1,e:[[24,"Heavy Armor"],[25,"Commander"],[26,"Vector Hound"]]},
+{p:"World of Balance",loc:"South Figaro Cave — SECOND trek",m:1,e:[[27,"Cartagra"],[28,"Acrophies"],[29,"Gold Bear"],[283,"Tunnel Armor — boss"]]},
+{p:"World of Balance",loc:"Narshe Mines West — Terra's scenario",m:1,e:[[30,"Valeor"],[31,"Wild Rat"]]},
+{p:"World of Balance",loc:"Doma region overworld",m:1,e:[[32,"Stray Cat"],[33,"Aepyornis"],[34,"Nettlehopper"],[35,"Chippirabbit"]]},
+{p:"World of Balance",loc:"Doma Castle / Imperial Camp",m:1,e:[[36,"Captain"],[37,"Imperial Soldier"],[38,"Templar"],[39,"Satellite"],[279,"Magitek Armor — boss"]]},
+{p:"World of Balance",loc:"Phantom Forest",m:1,e:[[40,"Ghost"],[41,"Poplium"]]},
+{p:"World of Balance",loc:"Phantom Train",m:1,e:[[42,"Cloud"],[43,"Angel Whisper"],[44,"Oversoul"],[45,"Bomb"],[46,"Living Dead"],[47,"Apparition — box"],[48,"Siegfried — box"],[284,"Phantom Train — boss"]]},
+{p:"World of Balance",loc:"Baren Falls",m:1,e:[[49,"Opinicus Fish"],[285,"Rhizopas — boss"]]},
+{p:"World of Balance",loc:"Serpent Trench (WoB)",m:1,e:[[50,"Anguiform"],[51,"Aspiran"],[52,"Actinian"]]},
+{p:"World of Balance",loc:"Battle of Narshe",m:1,e:[[53,"Fidor"],[54,"Corporal"],[55,"Hunting Hound"],[286,"Hell's Rider"],[287,"Kefka — boss"]]},
+{p:"World of Balance",loc:"Kohlingen / Southern deserts",e:[[56,"Fossil Dragon"]]},
+{p:"World of Balance",loc:"Kohlingen region plains / forests",e:[[57,"Vulture"],[58,"Iron Fist"],[59,"Bloodfang"],[60,"Rock Wasp"],[61,"Paraladia"]]},
+{p:"World of Balance",loc:"Zozo",e:[[62,"Harvester"],[63,"Hill Gigas — outdoors"],[64,"Gobbledygook"],[65,"Veil Dancer — indoors"]]},
+{p:"World of Balance",loc:"Opera House rafters",m:1,e:[[66,"Stunner"],[67,"Goetia"]]},
+{p:"World of Balance",loc:"Southern Continent (WoB)",e:[[68,"Litwor Chicken"],[69,"Joker"],[70,"Don"],[71,"Wyvern"],[72,"Grasswyrm"],[74,"Bug — deserts"]]},
+{p:"World of Balance",loc:"Forest west of the Veldt",e:[[73,"Grenade"]]},
+{p:"World of Balance",loc:"Imperial Magitek Research Facility",m:1,e:[[75,"Onion Knight"],[76,"Sergeant"],[77,"Belzecue"],[78,"Proto Armor"],[79,"Trapper"],[80,"Flan — disposal pit"],[81,"General — staircase"],[82,"Destroyer"],[83,"Lenergia"],[84,"Magna Roader (purple)"],[85,"Magna Roader (RED) — check lead!"],[86,"Chaser"]]},
+{p:"World of Balance",loc:"Cave to the Sealed Gate",m:1,e:[[87,"Outcast"],[88,"Provoker"],[89,"Zombie Dragon"],[90,"Antares"],[91,"Lich"]]},
+{p:"World of Balance",loc:"Vector banquet",m:1,e:[[92,"Imperial Elite"],[93,"Mega Armor"]]},
+{p:"World of Balance",loc:"Crescent Island",e:[[94,"Briareus"],[95,"Devourer"],[96,"Chimera"]]},
+{p:"World of Balance",loc:"Triangle Island",e:[[97,"Intangir"]]},
+{p:"World of Balance",loc:"Burning Home, Thamasa",m:1,e:[[98,"Balloon"]]},
+{p:"World of Balance",loc:"Esper Caves",m:1,e:[[99,"Bonnacon"],[100,"Land Grillon"],[101,"Adamankary"],[102,"Mandrake"],[103,"Venobennu"]]},
+{p:"World of Balance",loc:"Imperial Air Force sequence",m:1,e:[[104,"Sky Armor"],[105,"Spitfire"]]},
+{p:"World of Balance",loc:"Floating Continent",m:1,e:[[106,"Brainpan"],[107,"Misfit"],[108,"Apocrypha"],[109,"Dragon"],[110,"Platinum Dragon"],[111,"Behemoth"],[112,"Ninja"]]},
+{p:"World of Balance",loc:"Floating Continent escape",m:1,e:[[113,"Naude — must KILL"]]},
+{p:"World of Ruin",loc:"Solitary Island",e:[[116,"Peeper"],[119,"Land Ray — desert"],[121,"Black Dragon"]]},
+{p:"World of Ruin",loc:"Southern Continent (WoR)",e:[[114,"Fafnir"],[115,"Killer Mantis"],[117,"Murussu"],[118,"Gigantoad"],[120,"Luna Wolf"],[122,"Rukh"]]},
+{p:"World of Ruin",loc:"Collapsing House",m:1,e:[[123,"Zokka"],[124,"Nightwalker"],[125,"Scorpion"]]},
+{p:"World of Ruin",loc:"Serpent Trench (WoR)",e:[[126,"Delta Beetle"],[127,"Vampire Thorn"],[128,"Lizard"],[129,"Devoahan"]]},
+{p:"World of Ruin",loc:"Figaro Continent",e:[[130,"Sandhorse"],[131,"Cancer"],[132,"Oceanus"],[133,"Desert Hare"]]},
+{p:"World of Ruin",loc:"South Figaro Cave / Figaro Castle",e:[[134,"Humpty"],[135,"Cruller"],[136,"Dropper — engine room"],[137,"Neck Hunter"],[138,"Dante"]]},
+{p:"World of Ruin",loc:"Kohlingen Continent",e:[[139,"Bogy"],[140,"Marchosias"],[141,"Deepeye"],[142,"Mousse"]]},
+{p:"World of Ruin",loc:"Darill's Tomb",e:[[143,"Borghese"],[144,"Malboro"],[145,"Cloudwraith"],[146,"Exoray"],[147,"Skeletal Horror"]]},
+{p:"World of Ruin",loc:"Mt. Zozo",e:[[148,"Mugbear"],[149,"Devil Fist"],[150,"Luridan"],[151,"Punisher"],[152,"Glasya Labolas"]]},
+{p:"World of Ruin",loc:"Cave on the Veldt",e:[[153,"Gorgimera"],[154,"Twinscythe"],[155,"Death Warden — box"]]},
+{p:"World of Ruin",loc:"Owzer's Mansion",m:1,e:[[156,"Misty — woman painting"],[157,"Rafflesia — FLOWER painting"],[158,"Still Life — Maria painting"],[159,"Coeurl Cat"],[160,"Crusher"],[161,"Blade Dancer"],[162,"Caladrius"]]},
+{p:"World of Ruin",loc:"Phoenix Cave",e:[[163,"Ouroboros"],[164,"Face"],[165,"Zeveak"],[166,"Seaflower"],[167,"Galypdes"],[168,"Necromancer"],[169,"Clymenus"],[170,"Chaos Dragon"]]},
+{p:"World of Ruin",loc:"Dinosaur Forest",e:[[171,"Brachiosaur"],[172,"Tyrannosaur"]]},
+{p:"World of Ruin",loc:"WoR overworld — Doma / Jidoor / Maranda",e:[[173,"Tumbleweed"],[174,"Leap Frog"],[175,"Slagworm"],[176,"Cactuar"],[177,"Crawler"],[178,"Sprinter"],[179,"Basilisk"],[180,"Lycaon"],[181,"Greater Mantis"]]},
+{p:"World of Ruin",loc:"Narshe (WoR)",e:[[182,"Test Rider"],[183,"Wizard"],[184,"Lukhavi"],[185,"Magna Roader (yellow)"],[186,"Magna Roader (brown)"],[187,"Psychos"],[188,"Garm"]]},
+{p:"World of Ruin",loc:"Yeti's Cave",e:[[189,"Tonberry"],[190,"Onion Dasher"],[191,"Anemone"],[192,"Illuyankas"],[193,"Knotty"],[194,"Tzakmaqiel"]]},
+{p:"World of Ruin",loc:"Triangle Island (WoR)",e:[[195,"Zone Eater"]]},
+{p:"World of Ruin",loc:"Crescent Island (WoR)",e:[[196,"Vasegiatta"],[197,"Gloomwind"],[198,"Purusa"]]},
+{p:"World of Ruin",loc:"Zone Eater's Belly",e:[[199,"Covert"],[200,"Kamui"],[201,"Wartpuck"],[202,"Shambling Corpse"],[203,"Amduscias"],[204,"Baalzephon"]]},
+{p:"World of Ruin",loc:"Cyan's Dream",m:1,e:[[205,"Samurai"],[206,"Al Jabr"],[207,"Suriander"],[208,"Weredragon"],[209,"Schmidt — cave"],[210,"Pluto Armor — cave"],[211,"Alluring Rider"],[212,"Pandora"],[213,"Parasite"],[214,"Coco"],[215,"Io — cave"]]},
+{p:"World of Ruin",loc:"Ancient Castle",e:[[216,"Armored Weapon"],[217,"Lunatys"],[218,"Figaro Lizard — cave"],[219,"Devil — cave"],[220,"Enuo — cave"]]},
+{p:"World of Ruin",loc:"Cultists' Tower",e:[[221,"Magic Urn"],[222,"Level 10 Magic"],[223,"Level 20 Magic"],[224,"Level 30 Magic"],[225,"Level 40 Magic"],[226,"Level 50 Magic"],[227,"Level 60 Magic"],[228,"Level 70 Magic"],[229,"Level 80 Magic"],[230,"Level 90 Magic"]]},
+{p:"World of Ruin",loc:"Ebot's Rock",e:[[231,"Warlock"],[232,"Mahadeva"],[233,"Sorath"],[234,"Medusa Chicken"],[235,"Creature"],[236,"Moonform"],[237,"Aspidochelon"]]},
+{p:"World of Ruin",loc:"Coliseum",e:[[238,"Siegfried"]]},
+{p:"World of Ruin",loc:"Kefka's Tower",e:[[239,"Yojimbo"],[240,"Dark Force"],[241,"Muud Suud"],[242,"Fiend Dragon"],[243,"Mover"],[244,"Cherry"],[245,"Vector Lythos"],[246,"Primeval Dragon"],[247,"Landworm"],[248,"Gamma"],[249,"Great Malboro"],[250,"Outsider"],[251,"Demon Knight"],[252,"Duel Armor"],[253,"Great Behemoth"],[254,"Vector Chimera"],[255,"Fortis"],[256,"Junk"],[257,"InnoSent"],[258,"Daedalus"],[259,"Ahriman"],[260,"Death Machine"],[261,"Metal Hitman"],[262,"Prometheus"]]},
+{p:"World of Balance",loc:"Narshe Mines — prologue bosses",m:1,e:[[276,"Ymir (Shell)"],[277,"Ymir (Head)"],[278,"Guard Leader"]]}
+];
+var ROSTER=[
+ {name:"Terra",stat:"role-terra",note:"Configurable above"},
+ {name:"Locke",stat:"Strength",note:""},
+ {name:"Edgar",stat:"Strength",note:""},
+ {name:"Sabin",stat:"Magic",note:"Highest HP/MP toll — 8 levels"},
+ {name:"Celes",stat:"role-celes",note:"Configurable above"},
+ {name:"Cyan",stat:"Strength",note:"Highest HP/MP toll — 8 levels"},
+ {name:"Shadow",stat:"Magic",note:"Magic when leveling to 99 — Shuriken caps anyway"},
+ {name:"Gau",stat:"DUAL",note:"Zona Seeker to 26, then backfill Bismarck. No HP/MP."},
+ {name:"Setzer",stat:"Magic",note:"Fixed Dice ignores stats"},
+ {name:"Mog",stat:"Strength",note:"Endgame Jump user"},
+ {name:"Strago",stat:"Magic",note:""},
+ {name:"Relm",stat:"Magic",note:""}
+];
+
+/* ---------- state ---------- */
+var S={checked:{},terra:"Magic",celes:"Strength"},tab="gates",open={};
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){note("Storage blocked — use Back up progress.");}}
+function note(t){var m=document.getElementById("msg");m.textContent=t;if(t)setTimeout(function(){if(m.textContent===t)m.textContent="";},4000);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+function allKeys(){var a={};PHASES.forEach(function(p){p.gates.forEach(function(g){g.items.forEach(function(it,i){a[itemKey(g,it,i)]=1;});});});return Object.keys(a);}
+
+/* Items written as "Label|N" share storage with bestiary entry N, so ticking
+   one view ticks the other. Unlinked items keep a gate-local key. */
+function itemKey(g,it,i){var p=String(it).split("|");return p[1]?"b:"+p[1]:g.id+":"+i;}
+function itemLabel(it){return String(it).split("|")[0];}
+function itemNum(it){var p=String(it).split("|");return p[1]||"";}
+function progress(){var k=allKeys(),d=0;k.forEach(function(x){if(S.checked[x])d++;});return{d:d,t:k.length};}
+
+/* ---------- render ---------- */
+function renderHead(){
+  var p=progress(),pct=p.t?Math.round(p.d/p.t*100):0;
+  document.getElementById("fill").style.width=pct+"%";
+  document.getElementById("count").textContent=p.d+" / "+p.t+" requirements cleared · "+pct+"%";
+}
+
+function gatesHTML(){
+  var h="";
+  PHASES.forEach(function(ph){
+    h+='<section class="phase"><div class="phase-name">'+esc(ph.name)+'</div><div class="phase-note">'+esc(ph.note)+'</div>';
+    ph.gates.forEach(function(g){
+      var done=0;g.items.forEach(function(it,i){if(S.checked[itemKey(g,it,i)])done++;});
+      var sealed=done===g.items.length,isOpen=!!open[g.id];
+      h+='<div class="gate'+(sealed?" sealed":"")+'">';
+      h+='<button class="gate-head" data-gate="'+g.id+'" aria-expanded="'+isOpen+'">';
+      h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">'+esc(g.title)+'</span>';
+      h+=sealed?'<span class="stamp">SEALED</span>':'<span class="tally">'+done+"/"+g.items.length+'</span>';
+      h+='</button>';
+      if(isOpen){
+        h+='<div class="gbody"><div class="seal-line">Closes on: <b>'+esc(g.seal)+'</b></div>';
+        if(g.warn)h+='<div class="warn">'+esc(g.warn)+'</div>';
+        g.items.forEach(function(it,i){
+          var k=itemKey(g,it,i),on=!!S.checked[k],num=itemNum(it);
+          h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'"><span class="box">'+(on?"✓":"")+'</span><span>'+esc(itemLabel(it))
+           +(num?' <span style="color:var(--magicite);font-size:10px">#'+num+'</span>':"")+'</span></button>';
+        });
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+    h+='</section>';
+  });
+  return h;
+}
+
+function levelsHTML(){
+  var h='<div class="card"><h3>Role split</h3><p class="p">Terra and Celes both work either way. Raising one as each avoids duplicating a role.</p>';
+  [["terra","Terra",S.terra],["celes","Celes",S.celes]].forEach(function(r){
+    h+='<div class="row"><span>'+r[1]+'</span>';
+    ["Magic","Strength"].forEach(function(s){
+      h+='<button class="seg'+(r[2]===s?" on":"")+'" data-role="'+r[0]+'" data-val="'+s+'">'+s+'</button>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  h+='<div class="card"><h3>Windows</h3>'
+   +'<p class="p"><b>HP — Bahamut (+50%).</b> Equip after gaining 68, remove after gaining 71. Three levels.</p>'
+   +'<p class="p"><b>MP — Crusader (+50%).</b> Equip after gaining 47, remove after gaining 50. Extra levels sit on either side.</p>'
+   +'<p class="p"><b>Combat stats are +2 per level and hard-cap at 128.</b> Swap espers the moment one caps — further levels under it are wasted.</p></div>';
+  h+='<table><thead><tr><th>Character</th><th>Stat</th><th>Crusader</th><th>Bahamut</th></tr></thead><tbody>';
+  ROSTER.forEach(function(c){
+    var dual=c.stat==="DUAL";
+    var st=c.stat==="role-terra"?S.terra:c.stat==="role-celes"?S.celes:dual?"Str + Mag":c.stat;
+    h+='<tr><td class="nm">'+esc(c.name)+(c.note?'<span class="sub">'+esc(c.note)+'</span>':"")+'</td>';
+    h+='<td class="'+(dual?"dual":"")+'">'+esc(st)+'</td>';
+    h+='<td class="'+(dual?"skip":"")+'">'+(dual?"skip":MP[c.name]+" lv")+'</td>';
+    h+='<td class="'+(dual?"skip":"")+'">'+(dual?"skip":"69–71")+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  h+='<div class="card" style="margin-top:14px"><h3>Why Gau skips</h3>'
+   +'<p class="p">Dual-capping needs roughly 99 levels against his ~92. HP/MP maxing would cost another seven, so it is the first thing to cut. Expect to land slightly short on one side — the route commits his first ~19 levels to Zona Seeker, so Strength is the backfill.</p>'
+   +'<p class="p">Everyone else has 37–52 spare levels after capping their primary. For them the HP and MP windows are free.</p></div>';
+  return h;
+}
+
+function ragesHTML(){
+  var h='<div class="card"><h3>Front-load these</h3><p class="p">A full bestiary means fighting nearly every formation, which crowds the Veldt. Get the combat-critical Rages before that happens — everything else is opportunistic.</p>'
+   +'<p class="p">The Veldt only replays formations you have already fought, so it cleans up nothing you skipped in the field.</p></div>';
+  h+='<div class="card"><h3 style="color:var(--warn)">Stray Cat — hard window</h3>'
+   +'<p class="p"><b>Missable.</b> Lost permanently if never encountered in the World of Balance. Fight one on the <b>Doma region overworld</b> during Sabin\'s scenario; it then becomes available on the Veldt as soon as Gau joins.</p>'
+   +'<p class="p">Cat Scratch deals <b>quadruple damage</b> to a single target — his strongest physical Rage. Simmeh skips it only because no boss in his route requires it.</p>'
+   +'<p class="p">Veldt formations: <b>group 7</b> slots 1 (Stray Cat x3), 2 and 6, plus <b>group 8</b> slot 1. The x3 formation in group 7 is the cleanest target.</p></div>';
+  h+='<div class="card"><h3>How the Veldt actually picks</h3>'
+   +'<p class="p">Groups run 1 → 64 and then wrap. Each battle advances you one group. Within a group the game rolls 0–7; <b>if you have not encountered that formation it moves to the next slot</b> until it finds one you have. Groups where you know nothing are skipped entirely.</p>'
+   +'<p class="p"><b>This is exactly why a full bestiary makes Rage hunting harder.</b> While a group has only one formation you know, every roll collapses onto it. Once you have filled all eight slots, it becomes a true 1-in-8. Get the Rages you need from a group <i>before</i> you finish filling that group in.</p>'
+   +'<p class="p">The old <b>reload-advances-13-groups</b> trick is a SNES/PlayStation behaviour. Later versions randomise the group on reload instead, so manipulation guides written for those versions may not transfer — test before relying on it.</p></div>';
+  h+='<table><thead><tr><th>Rage</th><th>Source</th><th>Ability</th></tr></thead><tbody>';
+  RAGES.forEach(function(r){
+    var k="rage:"+r.n,on=!!S.checked[k],o=on?';opacity:.5':"";
+    h+='<tr data-key="'+k+'" style="cursor:pointer"><td class="nm" style="'+o.slice(1)+'">'
+     +'<span style="color:'+(on?"var(--sealed)":"var(--rule)")+'">'+(on?"✓ ":"□ ")+'</span>'+esc(r.n)
+     +(r.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WOB ONLY</span>':"")
+     +'<span class="sub">'+esc(r.w)+'</span></td>'
+     +'<td style="'+o.slice(1)+'">'+esc(r.g)+'</td><td style="'+o.slice(1)+'">'+esc(r.a)+'</td></tr>';
+  });
+  return h+'</tbody></table>';
+}
+
+function notesHTML(){
+  return ''
++'<details open><summary>Route merge — how this run differs</summary><div class="doc">'
++'<h4>What this reconciles</h4>'
++'<p>Two guides that were never written to work together. <b>Simmeh\'s Low Level/Perfect Stats Walkthrough</b> (Steam) gives boss strategy and level discipline but explicitly disclaims bestiary coverage. <b>bover_87\'s Missable Item Walkthrough</b> (GameFAQs) gives the cutoffs but knows nothing about level-locking. Where one says skip and the other says kill, the Gates tab already resolves it.</p>'
++'<h4>The core reframe</h4>'
++'<p>Simmeh keeps encounters <b>off</b> all game to limit Veldt entropy so Gau\'s Rages stay findable. A full bestiary wants the opposite. Accept the congested Veldt — it is the price of the run. Mitigate by front-loading the eight Rages on the Rages tab.</p>'
++'<p>With EXP at 0x, extra combat is <b>free</b>. Nothing about fighting more threatens the stat plan during Phase I. The threat is dying at level 5.</p>'
++'<h4>Phase I survival pattern</h4>'
++'<p>Gobbledygook Rage to Vanish the party, or the Phantom esper once you have it. An Invisible party is immune to physicals, which trivialises most low-level grinding. Simmeh uses this only for Number 024 and the Esper Cave — use it far more broadly.</p>'
++'<h4>The three traps that matter most</h4>'
++'<ul>'
++'<li><b>Cave to the Sealed Gate.</b> Simmeh says to waltz through with encounters off because there are no Rages worth having. That cave hard-locks five entries plus the Ultima Weapon, Heiji\'s Jitte and Kazekiri #2 when you board at Albrook.</li>'
++'<li><b>Air Force.</b> His PSG strategy is two Thundaras on the main body, which ends the fight before Bit ever spawns. Bit never appears again.</li>'
++'<li><b>Naude.</b> Must be killed, not merely forced to flee. Imp is the standard clear and it makes them run, registering nothing. Six-minute timer, and Celes is force-joined — so level her before ascending past Ultima Weapon.</li>'
++'</ul>'
++'<h4>Best synergy</h4>'
++'<p>The Floating Continent. Simmeh\'s low-level advice is to flee Ninjas and Dragons on sight, but in a PSG you arrive with a level-26 Gau. The eight required entries fold into the same trip where you are already farming to level Shadow and your Break-caster.</p>'
++'<h4>Verification tool</h4>'
++'<p>The <b>main-menu</b> bestiary — not the in-game one — has a Display Map that puts a <b>?</b> marker on any location with unregistered entries. Run it before every gate, especially the end-of-Act-I audit.</p>'
++'<p>Registration rule: a monster generally must be <b>defeated</b> to enter the bestiary. Fleeing is enough for Veldt appearance but not for the entry.</p>'
++'<h4 class="flag">No safety net in PR</h4>'
++'<p>The Pixel Remaster deliberately omits the GBA-era additions, including the <b>Soul Shrine</b>. That matters because several guides — including bover_87\'s own PR bestiary checklist, which marks some entries as Veldt-<i>or</i>-Soul-Shrine — inherited that assumption from older versions.</p>'
++'<p><b>Treat every Soul Shrine fallback as nonexistent.</b> Magna Roader (red) and Rafflesia are the two most often waved off as recoverable. In PR they are not.</p>'
++'<h4 class="flag">Still unverified</h4>'
++'<ul>'
++'<li><b>Bit trigger.</b> bover_87 says kill all adds; RPG Site says PR specifically requires the Laser Gun and only the Laser Gun. Quicksave and test.</li>'
++'<li><b>Reload behaviour.</b> The +13 group jump is SNES/PS. Later versions randomise instead. Confirm which applies before leaning on Veldt manipulation.</li>'
++'</ul>'
++'</div></details>'
+
++'<details><summary>Esper maths — what HP/MP maxing costs</summary><div class="doc">'
++'<h4>Best esper per stat</h4>'
++'<ul><li>HP +50% — Bahamut</li><li>MP +50% — Crusader</li>'
++'<li>Strength +2 — Bismarck, Raiden</li><li>Magic +2 — Zona Seeker, Valigarmanda</li>'
++'<li>Stamina +2 — Golem, Lakshmi</li><li>Speed +2 — Odin</li></ul>'
++'<h4>The cost</h4>'
++'<p>Three Bahamut levels for HP, plus three to five Crusader levels for MP depending on character. Total <code>6–8 levels</code>, or <code>12–16</code> forgone points of Strength or Magic.</p>'
++'<h4>Does it matter?</h4>'
++'<p><b>Single-stat build: no.</b> You have roughly 90–94 level-ups. Capping one stat from a typical base costs <code>(128 − base) ÷ 2 ≈ 42–53</code>, leaving 37–52 spare. Six to eight of those is nothing. Take the HP and MP.</p>'
++'<p><b>Dual-stat build: decisive.</b> Two caps need about <code>94</code> levels against a <code>90–94</code> budget — already marginal before spending anything. Adding 6–8 puts it clearly out of reach.</p>'
++'<p>Gau is the only character the guide marks as needing both, which is why he is the only one skipping HP/MP here.</p>'
++'<h4>Climb order</h4>'
++'<ul><li>6 → ~47 — primary stat esper, watch the 128 cap</li>'
++'<li>48 → 50 — Crusader, plus extra levels for anyone needing 4 or 5</li>'
++'<li>51 → 68 — back to primary, or start a second stat if capped</li>'
++'<li>69 → 71 — Bahamut</li>'
++'<li>72 → 99 — secondary stat, then Speed/Stamina dumping</li></ul>'
++'<h4 class="flag">Still unverified</h4>'
++'<ul>'
++'<li><b>Per-character base stats.</b> Confirmed only for Relm (Vig 26 / Spd 34 / Sta 22 / Mag 44) and Mog (29 / 36 / 26 / 35), from a PlayStation-era guide. The level maths above is therefore approximate to about ±3 levels — not precise enough to settle a marginal dual-cap.</li>'
++'<li><b>Per-character HP growth curves.</b> Each character has their own, so the best three-level Bahamut window may not be 69–71 for everyone. That changes how much HP those levels yield, not whether to spend them. Community consensus also holds the Fandom wiki\'s MP figures are wrong — cross-check.</li>'
++'</ul>'
++'</div></details>'
+
++'<details><summary>Sources</summary><div class="doc"><ul>'
++'<li>Simmeh — <i>Low Level/Perfect Stats Walkthrough</i>, Steam guide 3614190585</li>'
++'<li>bover_87 — <i>FFVI PR Guide and Walkthrough</i> v1.1, GameFAQs (Missable Item Walkthrough, Bestiary Checklist, Stat Boosting)</li>'
++'<li>RPG Site — FF6 PR walkthrough, missable bestiary entries</li>'
++'<li>PSNProfiles — PR walkthrough: 346 entries, 214 chests, 50 hidden items, 27 magicite</li>'
++'</ul></div></details>';
+}
+
+function bestiaryHTML(){
+  var tot=0,got=0;
+  BEST.forEach(function(g){g.e.forEach(function(x){tot++;if(S.checked["b:"+x[0]])got++;});});
+  var pct=tot?Math.round(got/tot*100):0;
+  var h='<div class="card"><h3>Bestiary — by earliest location</h3>'
+   +'<div class="bar"><i style="width:'+pct+'%"></i></div>'
+   +'<div class="count" style="margin-bottom:9px">'+got+' / '+tot+' entries · '+pct+'%</div>'
+   +'<p class="p">Ordered by route, not by bestiary number, so each block is a place you can clear in one visit. Blocks marked <b style="color:var(--warn)">CLOSES</b> become unreachable once you move on.</p>'
+   +'<p class="p">A monster must be <b>defeated</b> to register. Fleeing counts for the Veldt but not the entry.</p></div>';
+  var lastP="";
+  BEST.forEach(function(g,gi){
+    if(g.p!==lastP){h+='<div class="phase-name" style="margin:20px 0 10px">'+esc(g.p)+'</div>';lastP=g.p;}
+    var d=0;g.e.forEach(function(x){if(S.checked["b:"+x[0]])d++;});
+    var full=d===g.e.length,isOpen=!!open["b"+gi];
+    h+='<div class="gate'+(full?" sealed":"")+'">';
+    h+='<button class="gate-head" data-gate="b'+gi+'" aria-expanded="'+isOpen+'">';
+    h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">'+esc(g.loc)
+     +(g.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">CLOSES</span>':"")+'</span>';
+    h+=full?'<span class="stamp">DONE</span>':'<span class="tally">'+d+"/"+g.e.length+'</span>';
+    h+='</button>';
+    if(isOpen){
+      h+='<div class="gbody">';
+      g.e.forEach(function(x){
+        var k="b:"+x[0],on=!!S.checked[k];
+        h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
+         +'<span class="box">'+(on?"✓":"")+'</span>'
+         +'<span style="color:var(--ink-dim);width:34px;flex:none">#'+x[0]+'</span>'
+         +'<span>'+esc(x[1])+'</span></button>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  h+='<div class="card" style="margin-top:16px"><h3 class="flag" style="color:var(--warn)">Scope and caveats</h3>'
+   +'<p class="p">This covers all <b>262 regular entries</b> plus the early bosses. PR numbers bosses on a separate track, and the remaining boss entries are straightforward — you cannot miss a boss you had to fight to progress. Use the in-game counter for those.</p>'
+   +'<p class="p">Locations follow bover_87\'s PR guide, not the general Final Fantasy wiki, because PR moved some spawns. Where the two disagree — Leaf Bunny and Darkwind, for example — this list follows the PR source.</p>'
+   +'<p class="p">Your best cross-check is still in-game: the main-menu bestiary Display Map marks unregistered entries with a <b>?</b>.</p></div>';
+  return h;
+}
+
+function render(){
+  renderHead();
+  document.getElementById("view").innerHTML =
+    tab==="gates"?gatesHTML():tab==="beasts"?bestiaryHTML():tab==="levels"?levelsHTML():
+    tab==="rages"?ragesHTML():notesHTML();
+}
+
+/* ---------- events ---------- */
+document.querySelector("nav").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-tab]");if(!b)return;
+  tab=b.dataset.tab;
+  document.querySelectorAll("nav button").forEach(function(x){x.setAttribute("aria-selected",x===b);});
+  render();window.scrollTo(0,0);
+});
+
+document.getElementById("view").addEventListener("click",function(e){
+  var g=e.target.closest("[data-gate]");
+  if(g){open[g.dataset.gate]=!open[g.dataset.gate];render();return;}
+  var k=e.target.closest("[data-key]");
+  if(k){S.checked[k.dataset.key]=!S.checked[k.dataset.key];save();render();return;}
+  var r=e.target.closest("[data-role]");
+  if(r){S[r.dataset.role]=r.dataset.val;save();render();}
+});
+
+document.getElementById("export").addEventListener("click",function(){
+  var io=document.getElementById("io");
+  io.style.display="block";io.value=JSON.stringify(S);io.select();
+  note("Copy this text somewhere safe — Notes, email, anywhere.");
+});
+document.getElementById("import").addEventListener("click",function(){
+  var io=document.getElementById("io");
+  if(io.style.display!=="block"){io.style.display="block";io.value="";io.focus();note("Paste a progress code, then tap Restore again.");return;}
+  try{
+    var p=JSON.parse(io.value);
+    S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";
+    save();render();io.style.display="none";note("Progress restored.");
+  }catch(err){note("That code could not be read. Check it copied fully.");}
+});
+document.getElementById("reset").addEventListener("click",function(){
+  if(!confirm("Clear all tracked progress?"))return;
+  S.checked={};save();render();note("Cleared.");
+});
+
+render();
+</script>
+</body>
+</html>

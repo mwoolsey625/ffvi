@@ -10,7 +10,9 @@
 <link rel="icon" href="icon.png">
 <meta name="theme-color" content="#0E1733">
 <title>FFVI PR — Perfect Stats + Full Bestiary</title>
-<style>:root{--field:#0E1733;--panel:#16224A;--panel2:#1C2A58;--rule:#4C6BB0;--rule-dim:#2B3D6E;--ink:#EEF2FF;--ink-dim:#93A4D4;--magicite:#B98CE8;--sealed:#54BE9A;--warn:#E8B15C;--cyan:#6FB7E0;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;background:var(--field)}body{color:var(--ink);font-family:var(--mono);font-size:15px;line-height:1.55;padding:calc(14px + env(safe-area-inset-top)) 12px calc(56px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto;-webkit-text-size-adjust:100%}header{border-bottom:1px solid var(--rule);padding-bottom:12px;margin-bottom:14px}.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--magicite);margin-bottom:6px}h1{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}.bar{height:5px;background:var(--rule-dim);border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--magicite);width:0;transition:width .35s ease}.count{font-size:11px;color:var(--ink-dim);margin-top:6px;letter-spacing:.05em}nav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}nav button{flex:1 1 28%;min-height:40px;padding:9px 2px;background:transparent;color:var(--ink-dim);border:1px solid var(--rule-dim);border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}nav button[aria-selected="true"]{background:var(--panel2);color:var(--ink);border-color:var(--rule)}button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);outline-offset:2px}.phase{margin-bottom:26px}.phase-name{font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:3px}.phase-note{font-size:11px;color:var(--ink-dim);margin-bottom:12px}.gate{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel);overflow:hidden}.gate.sealed{border-color:var(--sealed);background:var(--field)}.gate-head{width:100%;display:flex;align-items:center;gap:9px;padding:12px;min-height:54px;background:transparent;border:0;color:inherit;font-family:var(--mono);font-size:13px;text-align:left;cursor:pointer}.chev{color:var(--ink-dim);font-size:10px;width:9px;flex:none}.gate-title{flex:1;font-weight:600}.gate.sealed .gate-title{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}.stamp{font-size:9px;letter-spacing:.16em;padding:2px 6px;border-radius:2px;border:1px solid var(--sealed);color:var(--sealed);flex:none}.tally{font-size:10px;color:var(--ink-dim);flex:none;letter-spacing:.06em}.gbody{padding:0 12px 14px;border-top:1px solid var(--rule-dim)}.sect{display:flex;align-items:center;gap:9px;margin:22px -12px 8px;padding:11px 12px;background:var(--panel2);border-top:1px solid var(--rule-dim);border-bottom:1px solid var(--rule-dim);border-left:3px solid var(--magicite);font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}.sect-n{margin-left:auto;color:var(--ink-dim);font-size:11.5px;letter-spacing:.05em;font-weight:600}.sect-tag{font-size:10px;letter-spacing:.1em;padding:3px 8px;border-radius:2px;border:1px solid currentColor;font-weight:600;white-space:nowrap}.sect-note{font-size:11.5px;color:var(--ink-dim);margin:0 0 6px;line-height:1.5}.seal-line{font-size:10px;color:var(--ink-dim);letter-spacing:.05em;padding:9px 0 2px}.seal-line b{color:var(--warn);font-weight:600}.warn{font-size:11px;color:var(--warn);border-left:2px solid var(--warn);padding:5px 0 5px 9px;margin:8px 0 4px;line-height:1.45}.item{width:100%;display:flex;align-items:flex-start;gap:9px;padding:11px 0;min-height:46px;background:transparent;border:0;border-top:1px solid var(--rule-dim);color:var(--ink);font-family:var(--mono);font-size:13.5px;text-align:left;cursor:pointer}.box{width:15px;height:15px;flex:none;margin-top:1px;border:1px solid var(--rule);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--field)}.item.on .box{background:var(--sealed);border-color:var(--sealed)}.item.on span:last-child{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);font-weight:600;padding:0 8px 7px 0;border-bottom:1px solid var(--rule)}td{padding:9px 8px 9px 0;border-bottom:1px solid var(--rule-dim);vertical-align:top}.nm{font-weight:600;white-space:nowrap}.sub{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;line-height:1.4;white-space:normal}.dual{color:var(--magicite);font-weight:700}.skip{color:var(--ink-dim)}.card{border:1px solid var(--rule-dim);border-radius:4px;padding:13px;background:var(--panel);margin-bottom:14px}.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);margin:0 0 9px;font-weight:600}.p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 8px}.p:last-child{margin-bottom:0}.p b{color:var(--ink);font-weight:600}.seg{padding:8px 12px;min-height:38px;background:transparent;border:1px solid var(--rule-dim);color:var(--ink-dim);font-family:var(--mono);font-size:11px;cursor:pointer;border-radius:3px}.seg.on{background:var(--panel2);color:var(--ink);border-color:var(--magicite)}.row{display:flex;align-items:center;gap:8px;margin-top:8px}.row>span{width:52px;font-size:12px;font-weight:600}details{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel)}summary{padding:12px;cursor:pointer;font-size:13px;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary::before{content:"▶ ";color:var(--ink-dim);font-size:10px}details[open] summary::before{content:"▼ "}details[open] summary{border-bottom:1px solid var(--rule-dim)}.doc{padding:12px;font-size:13.5px;line-height:1.65;color:var(--ink-dim)}.doc h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--magicite);margin:16px 0 7px;font-weight:600}.doc h4:first-child{margin-top:0}.doc p{margin:0 0 9px}.doc b{color:var(--ink)}.doc ul{margin:0 0 9px;padding-left:17px}.doc li{margin-bottom:5px}.doc code{background:var(--panel2);padding:1px 5px;border-radius:2px;font-size:11.5px;color:var(--ink)}.doc .flag{color:var(--warn)}.tools{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}.tools button{padding:10px 13px;min-height:40px;background:transparent;border:1px solid var(--rule-dim);color:var(--ink-dim);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;cursor:pointer}#io{width:100%;margin-top:10px;background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);border-radius:3px;padding:9px;font-family:var(--mono);font-size:11px;min-height:70px;display:none}.msg{font-size:11px;color:var(--sealed);margin-top:9px;min-height:15px}@media (prefers-reduced-motion:reduce){*{transition:none!important}}</style>
+<style>:root{--field:#0E1733;--panel:#16224A;--panel2:#1C2A58;--rule:#4C6BB0;--rule-dim:#2B3D6E;--ink:#EEF2FF;--ink-dim:#93A4D4;--magicite:#B98CE8;--sealed:#54BE9A;--warn:#E8B15C;--cyan:#6FB7E0;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;background:var(--field)}body{color:var(--ink);font-family:var(--mono);font-size:15px;line-height:1.55;padding:calc(14px + env(safe-area-inset-top)) 12px calc(56px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto;-webkit-text-size-adjust:100%}header{border-bottom:1px solid var(--rule);padding-bottom:12px;margin-bottom:14px}.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--magicite);margin-bottom:6px}h1{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}.bar{height:5px;background:var(--rule-dim);border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--magicite);width:0;transition:width .35s ease}.count{font-size:11px;color:var(--ink-dim);margin-top:6px;letter-spacing:.05em}nav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}nav button{flex:1 1 28%;min-height:40px;padding:9px 2px;background:transparent;color:var(--ink-dim);border:1px solid var(--rule-dim);border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}nav button[aria-selected="true"]{background:var(--panel2);color:var(--ink);border-color:var(--rule)}button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);outline-offset:2px}.phase{margin-bottom:26px}.phase-name{font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:3px}.phase-note{font-size:11px;color:var(--ink-dim);margin-bottom:12px}.gate{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel);overflow:hidden}.gate.sealed{border-color:var(--sealed);background:var(--field)}.gate-head{width:100%;display:flex;align-items:center;gap:9px;padding:12px;min-height:54px;background:transparent;border:0;color:inherit;font-family:var(--mono);font-size:13px;text-align:left;cursor:pointer}.chev{color:var(--ink-dim);font-size:10px;width:9px;flex:none}.gate-title{flex:1;font-weight:600}.gate.sealed .gate-title{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}.stamp{font-size:9px;letter-spacing:.16em;padding:2px 6px;border-radius:2px;border:1px solid var(--sealed);color:var(--sealed);flex:none}.tally{font-size:10px;color:var(--ink-dim);flex:none;letter-spacing:.06em}.gbody{padding:0 12px 14px;border-top:1px solid var(--rule-dim)}.sect{width:100%;text-align:left;cursor:pointer;font-family:var(--mono);border-radius:0;display:flex;align-items:center;gap:9px;margin:22px -12px 8px;padding:11px 12px;background:var(--panel2);border-top:1px solid var(--rule-dim);border-bottom:1px solid var(--rule-dim);border-left:3px solid var(--magicite);font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}.sect-chev{font-size:9px;opacity:.75;width:9px;flex:none}
+.sect-n.ok{color:var(--sealed)!important}
+.sect-n{margin-left:auto;color:var(--ink-dim);font-size:11.5px;letter-spacing:.05em;font-weight:600}.sect-tag{font-size:10px;letter-spacing:.1em;padding:3px 8px;border-radius:2px;border:1px solid currentColor;font-weight:600;white-space:nowrap}.sect-note{font-size:11.5px;color:var(--ink-dim);margin:0 0 6px;line-height:1.5}.seal-line{font-size:10px;color:var(--ink-dim);letter-spacing:.05em;padding:9px 0 2px}.seal-line b{color:var(--warn);font-weight:600}.warn{font-size:11px;color:var(--warn);border-left:2px solid var(--warn);padding:5px 0 5px 9px;margin:8px 0 4px;line-height:1.45}.item{width:100%;display:flex;align-items:flex-start;gap:9px;padding:11px 0;min-height:46px;background:transparent;border:0;border-top:1px solid var(--rule-dim);color:var(--ink);font-family:var(--mono);font-size:13.5px;text-align:left;cursor:pointer}.box{width:15px;height:15px;flex:none;margin-top:1px;border:1px solid var(--rule);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--field)}.item.on .box{background:var(--sealed);border-color:var(--sealed)}.item.on span:last-child{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);font-weight:600;padding:0 8px 7px 0;border-bottom:1px solid var(--rule)}td{padding:9px 8px 9px 0;border-bottom:1px solid var(--rule-dim);vertical-align:top}.nm{font-weight:600;white-space:nowrap}.sub{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;line-height:1.4;white-space:normal}.dual{color:var(--magicite);font-weight:700}.skip{color:var(--ink-dim)}.card{border:1px solid var(--rule-dim);border-radius:4px;padding:13px;background:var(--panel);margin-bottom:14px}.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--magicite);margin:0 0 9px;font-weight:600}.p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 8px}.p:last-child{margin-bottom:0}.p b{color:var(--ink);font-weight:600}.seg{padding:8px 12px;min-height:38px;background:transparent;border:1px solid var(--rule-dim);color:var(--ink-dim);font-family:var(--mono);font-size:11px;cursor:pointer;border-radius:3px}.seg.on{background:var(--panel2);color:var(--ink);border-color:var(--magicite)}.row{display:flex;align-items:center;gap:8px;margin-top:8px}.row>span{width:52px;font-size:12px;font-weight:600}details{border:1px solid var(--rule-dim);border-radius:4px;margin-bottom:8px;background:var(--panel)}summary{padding:12px;cursor:pointer;font-size:13px;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary::before{content:"▶ ";color:var(--ink-dim);font-size:10px}details[open] summary::before{content:"▼ "}details[open] summary{border-bottom:1px solid var(--rule-dim)}.doc{padding:12px;font-size:13.5px;line-height:1.65;color:var(--ink-dim)}.doc h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--magicite);margin:16px 0 7px;font-weight:600}.doc h4:first-child{margin-top:0}.doc p{margin:0 0 9px}.doc b{color:var(--ink)}.doc ul{margin:0 0 9px;padding-left:17px}.doc li{margin-bottom:5px}.doc code{background:var(--panel2);padding:1px 5px;border-radius:2px;font-size:11.5px;color:var(--ink)}.doc .flag{color:var(--warn)}.tools{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}.tools button{padding:10px 13px;min-height:40px;background:transparent;border:1px solid var(--rule-dim);color:var(--ink-dim);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;cursor:pointer}#io{width:100%;margin-top:10px;background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);border-radius:3px;padding:9px;font-family:var(--mono);font-size:11px;min-height:70px;display:none}.msg{font-size:11px;color:var(--sealed);margin-top:9px;min-height:15px}@media (prefers-reduced-motion:reduce){*{transition:none!important}}</style>
 </head>
 <body>
 
@@ -37,6 +39,7 @@
 </div>
 <textarea id="io" spellcheck="false" placeholder="Progress code"></textarea>
 <div class="msg" id="msg"></div>
+<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build 20a6154</div>
 
 <script>
 "use strict";
@@ -169,8 +172,8 @@ var ROSTER=[
 ];
 var S={checked:{},terra:"Magic",celes:"Strength"},tab="route",open={};
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
-if(CANSTORE){try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";}}catch(e){}}
-function save(){if(!CANSTORE)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){note("Storage unavailable — use Back up progress.");}}
+if(CANSTORE){try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";if(p.open)open=p.open;}}catch(e){}}
+function save(){if(!CANSTORE)return;try{localStorage.setItem(KEY,JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,open:open}));}catch(e){note("Storage unavailable — use Back up progress.");}}
 function note(t){var m=document.getElementById("msg");m.textContent=t;if(t)setTimeout(function(){if(m.textContent===t)m.textContent="";},4000);}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function allKeys(){var a={};ROUTE.forEach(function(r){stopKeys(r).forEach(function(k){a[k]=1;});});return Object.keys(a);}
@@ -200,6 +203,31 @@ for(var i=0;i<PHASES.length;i++){var gs=PHASES[i].gates;
 for(var j=0;j<gs.length;j++) if(gs[j].id===id) return gs[j];}
 return null;
 }
+/* Urgent = must be done before leaving. Deferred = deliberately left for later:
+   WAIT-marked containers, and enemies in areas that stay open. */
+function stopSplit(r){
+var u={},d={};
+r[4].forEach(function(id){var g=gateById(id); if(!g)return;
+g.items.forEach(function(it,i){u[itemKey(g,it,i)]=1;});});
+r[5].forEach(function(bi){var bl=BEST[bi]; if(!bl)return;
+bl.e.forEach(function(x){var k="b:"+x[0];
+if(r[7]||MISSABLE[x[0]]||x[0]>=276) u[k]=1; else d[k]=1;});});
+r[6].forEach(function(ti){var ta=TREASURE[ti]; if(!ta)return;
+ta.e.forEach(function(x,i){var k=tkey(ta.a,x,i);
+if(x[0]==="W") d[k]=1; else u[k]=1;});});
+Object.keys(u).forEach(function(k){delete d[k];});
+return {u:Object.keys(u),d:Object.keys(d)};
+}
+
+/* 0 = things still due, 1 = nothing due but items deliberately left, 2 = all done */
+function stateOf(urgent,all){
+var ud=0; urgent.forEach(function(k){if(S.checked[k])ud++;});
+var ad=0; all.forEach(function(k){if(S.checked[k])ad++;});
+if(all.length&&ad===all.length) return {s:2,done:ad,total:all.length};
+if(urgent.length&&ud===urgent.length) return {s:1,done:ad,total:all.length};
+return {s:0,done:ad,total:all.length};
+}
+
 function stopKeys(r){
 var out={},k;
 r[4].forEach(function(id){var g=gateById(id); if(!g)return;
@@ -210,14 +238,20 @@ r[6].forEach(function(ti){var ta=TREASURE[ti]; if(!ta)return;
 ta.e.forEach(function(x,i){out[tkey(ta.a,x,i)]=1;});});
 return Object.keys(out);
 }
-function sect(title,n,accent,tag){
+function sect(title,n,done,accent,tag,skey,defOpen,st,tagCol){
 var c=accent||"var(--magicite)";
-return '<div class="sect" style="border-left-color:'+c+';color:'+c+'">'
+if(skey&&open[skey]===undefined) open[skey]=!!defOpen;
+var o=skey?!!open[skey]:true;
+return '<button class="sect" data-gate="'+(skey||"")+'" aria-expanded="'+o+'" '
++'style="border-left-color:'+c+';color:'+c+'">'
++'<span class="sect-chev">'+(o?"\u25bc":"\u25b6")+'</span>'
 +'<span>'+title+'</span>'
-+(tag?'<span class="sect-tag">'+tag+'</span>':"")
-+(n!=null?'<span class="sect-n">'+n+'</span>':"")
-+'</div>';
++(tag?'<span class="sect-tag"'+(tagCol?' style="color:'+tagCol+';border-color:'+tagCol+'"':"")+'>'+tag+'</span>':"")
++(!tag&&st===1?'<span class="sect-tag" style="color:var(--sealed);border-color:var(--sealed)">NOTHING DUE</span>':"")
++(n!=null?'<span class="sect-n'+(st?" ok":"")+'">'+(done!=null?done+"/"+n:n)+'</span>':"")
++'</button>';
 }
+
 function routeHTML(){
 var h='',lastPh=0;
 ROUTE.forEach(function(r,ri){
@@ -226,9 +260,8 @@ h+='<div class="phase-name" style="margin:22px 0 2px">'+esc(PHNAME[r[1]])+'</div
 +'<div class="phase-note">'+esc(PHNOTE[r[1]])+'</div>';
 lastPh=r[1];
 }
-var keys=stopKeys(r),d=0;
-keys.forEach(function(k){if(S.checked[k])d++;});
-var full=keys.length>0&&d===keys.length,isOpen=!!open["r"+ri];
+var keys=stopKeys(r),sp=stopSplit(r),stt=stateOf(sp.u,keys);
+var d=stt.done,full=stt.s===2,isOpen=!!open["r"+ri];
 h+='<div class="gate'+(full?" sealed":"")+'">';
 h+='<button class="gate-head" data-gate="r'+ri+'" aria-expanded="'+isOpen+'">';
 h+='<span class="chev">'+(isOpen?"\u25bc":"\u25b6")+'</span>';
@@ -238,7 +271,8 @@ var av=AVL[r[7]];
 h+='<span class="gate-title">'+esc(r[0])
 +(av?' <span style="color:'+av[1]+';font-size:9px;letter-spacing:.1em">'+av[0]+'</span>':"")+'</span>';
 h+=full?'<span class="stamp">CLEARED</span>'
-:'<span class="tally">'+d+"/"+keys.length+'</span>';
+:(stt.s===1?'<span class="stamp" style="border-color:var(--sealed);color:var(--sealed)">NOTHING DUE</span>'
+:'<span class="tally">'+d+"/"+keys.length+'</span>');
 h+='</button>';
 if(isOpen){
 h+='<div class="gbody">';
@@ -247,10 +281,12 @@ if(r[7]==="wob") h+='<div class="seal-line">Not available in the <b>World of Rui
 if(r[7]==="once") h+='<div class="seal-line">Single visit \u2014 <b>no way back</b></div>';
 if(r[7]==="timed") h+='<div class="seal-line"><b>Timer running</b> once you enter</div>';
 if(r[3].length){
-h+=sect("To do",r[3].length,"var(--magicite)");
-h+='<ul style="margin:2px 0 4px;padding-left:16px;font-size:12px;color:var(--ink);line-height:1.55">';
-r[3].forEach(function(t){h+='<li style="margin-bottom:5px">'+esc(t)+'</li>';});
-h+='</ul>';
+var sk="r"+ri+"t";
+h+=sect("To do",r[3].length,null,"var(--magicite)",null,sk,true);
+if(open[sk]){
+h+='<ul style="margin:2px 0 6px;padding-left:17px;font-size:13px;color:var(--ink);line-height:1.6">';
+r[3].forEach(function(t){h+='<li style="margin-bottom:6px">'+esc(t)+'</li>';});
+h+='</ul>';}
 }
 r[4].forEach(function(id){
 var g=gateById(id); if(!g) return;
@@ -258,8 +294,11 @@ if(g.warn) h+='<div class="warn">'+esc(g.warn)+'</div>';
 var solo=[];
 g.items.forEach(function(it,i){ if(!itemNum(it)) solo.push([it,i]); });
 if(!solo.length) return;
-h+=sect("Missable",solo.length,"var(--warn)");
-solo.forEach(function(pair){
+var skm="r"+ri+"m"+id;
+var md=0; solo.forEach(function(pr){if(S.checked[itemKey(g,pr[0],pr[1])])md++;});
+var mk=solo.map(function(pr){return itemKey(g,pr[0],pr[1]);});
+h+=sect("Missable",solo.length,md,"var(--warn)",null,skm,false,stateOf(mk,mk).s);
+if(open[skm]) solo.forEach(function(pair){
 var it=pair[0],i=pair[1],k=itemKey(g,it,i),on=!!S.checked[k];
 h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
 +'<span class="box">'+(on?"\u2713":"")+'</span><span>'+esc(itemLabel(it))+'</span></button>';
@@ -267,27 +306,49 @@ h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'"
 });
 var en=[]; r[5].forEach(function(bi){var bl=BEST[bi]; if(bl) bl.e.forEach(function(x){en.push(x);});});
 if(en.length){
-var perm=!r[7];
-h+=sect("Enemies",en.length,perm?"var(--sealed)":"var(--warn)",
-perm?"SAFE TO DEFER":"GET NOW");
-if(perm) h+='<div class="sect-note">This area stays open. Leave these until your '
-+'Rages are banked \u2014 every formation you fight crowds the Veldt.</div>';
+var ske="r"+ri+"e";
+var ed=0; en.forEach(function(x){if(S.checked["b:"+x[0]])ed++;});
+var isUrg=function(x){return !!(r[7]||MISSABLE[x[0]]||x[0]>=276);};
+var eAll=en.map(function(x){return "b:"+x[0];});
+var eUrg=en.filter(isUrg).map(function(x){return "b:"+x[0];});
+var allDef=eUrg.length===0,allUrg=eUrg.length===en.length;
+var est=stateOf(eUrg,eAll).s;
+var etag=allDef?"SAFE TO DEFER":(est>=1?"NOTHING DUE":(allUrg?"GET NOW":eUrg.length+" DUE NOW"));
+var ecol=(allDef||est>=1)?"var(--sealed)":"var(--warn)";
+h+=sect("Enemies",en.length,ed,ecol,etag,ske,false,est,ecol);
+if(open[ske]){
+if(!allUrg) h+='<div class="sect-note">'
++(allDef?'This area stays open. Leave these':'Unmarked entries stay available \u2014 leave them')
++' until your Rages are banked, since every formation you fight crowds the Veldt.</div>';
 en.forEach(function(x){
-var k="b:"+x[0],on=!!S.checked[k];
+var k="b:"+x[0],on=!!S.checked[k],ug=isUrg(x);
 h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
 +'<span class="box">'+(on?"\u2713":"")+'</span>'
 +'<span style="color:var(--ink-dim);width:34px;flex:none">#'+x[0]+'</span>'
 +'<span>'+esc(x[1])
-+(MISSABLE[x[0]]?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">MISSABLE</span>':"")
++(MISSABLE[x[0]]?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">MISSABLE</span>'
+:(ug&&!allUrg?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">DUE NOW</span>':""))
++(/box/i.test(x[1])?' <span style="color:var(--cyan);font-size:9px;letter-spacing:.1em">ONE SHOT \u2014 DO NOT FLEE</span>':"")
 +'</span></button>';
-});
+});}
 }
 var LBL={F:["",""],W:["WAIT","var(--magicite)"],
 N:["TAKE NOW","var(--warn)"],L:["LAST CHANCE","var(--sealed)"]};
 var tc=0; r[6].forEach(function(ti){if(TREASURE[ti]) tc+=TREASURE[ti].e.length;});
 if(tc){
-h+=sect("Treasure",tc,"var(--cyan)");
-r[6].forEach(function(ti){
+var skt="r"+ri+"c";
+var td=0; r[6].forEach(function(ti){var ta=TREASURE[ti]; if(ta) ta.e.forEach(function(x,i){if(S.checked[tkey(ta.a,x,i)])td++;});});
+var tAll=[],tUrg=[];
+r[6].forEach(function(ti){var ta=TREASURE[ti]; if(!ta)return;
+ta.e.forEach(function(x,i){var k=tkey(ta.a,x,i);tAll.push(k);if(x[0]!=="W")tUrg.push(k);});});
+var allWait=tAll.length>0&&tUrg.length===0;
+var tst=stateOf(tUrg,tAll).s;
+if(allWait&&tst!==2) tst=1;
+var ttag=allWait?"ALL UPGRADE \u2014 LEAVE"
+:(tst===1?"NOTHING DUE":(tUrg.length&&tUrg.length<tAll.length?tUrg.length+" DUE NOW":null));
+var tcol=allWait?"var(--magicite)":"var(--sealed)";
+h+=sect("Treasure",tc,td,"var(--cyan)",ttag,skt,false,tst,tcol);
+if(open[skt]) r[6].forEach(function(ti){
 var ta=TREASURE[ti]; if(!ta) return;
 if(r[6].length>1) h+='<div style="font-size:10px;color:var(--ink-dim);margin:7px 0 1px">'+esc(ta.a)+'</div>';
 if(ta.n) h+='<div class="warn">'+esc(ta.n)+'</div>';
@@ -571,7 +632,7 @@ if(r){S[r.dataset.role]=r.dataset.val;save();render();}
 });
 document.getElementById("export").addEventListener("click",function(){
 var io=document.getElementById("io");
-io.style.display="block";io.value=JSON.stringify(S);io.select();
+io.style.display="block";io.value=JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,open:open});io.select();
 note("Copy this text somewhere safe — Notes, email, anywhere.");
 });
 document.getElementById("import").addEventListener("click",function(){

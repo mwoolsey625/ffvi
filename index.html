@@ -509,7 +509,7 @@ function stateOf(urgent,all){
 var ud=0; urgent.forEach(function(k){if(S.checked[k])ud++;});
 var ad=0; all.forEach(function(k){if(S.checked[k])ad++;});
 if(all.length&&ad===all.length) return {s:2,done:ad,total:all.length};
-if(urgent.length&&ud===urgent.length) return {s:1,done:ad,total:all.length};
+if(ud===urgent.length) return {s:1,done:ad,total:all.length};
 return {s:0,done:ad,total:all.length};
 }
 

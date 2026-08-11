@@ -277,17 +277,86 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 <script>
 "use strict";
 var KEY = "ff6pr-tracker-v1";
-var S={checked:{},terra:"Magic",celes:"Strength",assign:{}},tab="route",open={};
+var GIST_KEY = "ff6pr-gist-id";
+var TOKEN_KEY = "ff6pr-gist-token";
+/* Permanent fallback so a fully wiped device (Safari "Clear website data",
+   or removing + re-adding the Home Screen icon) can still recover progress:
+   this ID is baked into the source, so it survives even when localStorage
+   \u2014 including the copy of the ID normally cached there \u2014 is gone. */
+var GIST_ID_BUILTIN = "596d1edfb7763ac049884fc4b5058b2d";
+var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={};
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
 var LOADFAIL=false;
 if(CANSTORE){var raw=localStorage.getItem(KEY);
-if(raw){try{var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};if(p.open)open=p.open;}
+if(raw){try{var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};S.updated=p.updated||0;if(p.open)open=p.open;}
 catch(e){LOADFAIL=true;try{localStorage.setItem(KEY+"-damaged",raw);}catch(e2){}}}}
+function note(t){
+var c=document.getElementById("count");if(!c)return;
+c.textContent=t;
+if(note._t)clearTimeout(note._t);
+note._t=setTimeout(function(){renderHead();},4000);
+}
 function save(){if(!CANSTORE||LOADFAIL)return;
+S.updated=Date.now();
 try{var prev=localStorage.getItem(KEY);if(prev)localStorage.setItem(KEY+"-prev",prev);
-localStorage.setItem(KEY,JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open}));}
-catch(e){note("Storage unavailable \u2014 use Back up progress.");}}
-function note(t){var m=document.getElementById("msg");m.textContent=t;if(t)setTimeout(function(){if(m.textContent===t)m.textContent="";},4000);}
+localStorage.setItem(KEY,JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated}));}
+catch(e){note("Storage unavailable \u2014 use Back up progress.");}
+scheduleCloudPush();}
+
+/* ---------- Cloud backup (private GitHub Gist) ----------
+   Local storage alone cannot survive a full Safari data wipe or a
+   Home Screen icon removal \u2014 both clear every key at once, including
+   any "previous version" copies kept in the same storage. A copy that
+   lives outside the browser (a Gist) is the only thing that survives that. */
+var CLOUD={status:"idle",lastSync:0,err:""};
+var pushTimer=null;
+function getToken(){try{return (CANSTORE&&localStorage.getItem(TOKEN_KEY))||"";}catch(e){return "";}}
+function setToken(t){try{if(!CANSTORE)return;if(t)localStorage.setItem(TOKEN_KEY,t);else localStorage.removeItem(TOKEN_KEY);}catch(e){}}
+function gistId(){if(GIST_ID_BUILTIN)return GIST_ID_BUILTIN;try{return (CANSTORE&&localStorage.getItem(GIST_KEY))||"";}catch(e){return "";}}
+function statePayload(){return JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,updated:S.updated});}
+function renderCloudStatus(){if(tab==="notes")render();}
+function scheduleCloudPush(){
+if(!getToken())return;
+if(pushTimer)clearTimeout(pushTimer);
+pushTimer=setTimeout(function(){pushTimer=null;cloudPush();},3000);
+}
+function cloudPush(){
+var tok=getToken(),gid=gistId();
+if(!tok)return;
+CLOUD.status="syncing";renderCloudStatus();
+var url,method,body;
+if(gid){
+url="https://api.github.com/gists/"+gid;method="PATCH";
+body=JSON.stringify({files:{"ff6-tracker-progress.json":{content:statePayload()}}});
+}else{
+url="https://api.github.com/gists";method="POST";
+body=JSON.stringify({description:"FFVI PR Run Tracker \u2014 progress backup",public:false,
+files:{"ff6-tracker-progress.json":{content:statePayload()}}});
+}
+fetch(url,{method:method,headers:{"Authorization":"token "+tok,
+"Accept":"application/vnd.github+json","Content-Type":"application/json"},body:body})
+.then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+.then(function(j){
+if(!gid&&j.id){try{if(CANSTORE)localStorage.setItem(GIST_KEY,j.id);}catch(e){}}
+CLOUD.status="synced";CLOUD.lastSync=Date.now();CLOUD.err="";renderCloudStatus();
+})
+.catch(function(e){CLOUD.status="error";CLOUD.err=String((e&&e.message)||e);renderCloudStatus();});
+}
+function cloudPull(cb){
+var gid=gistId();
+if(!gid){cb(null,null);return;}
+var tok=getToken(),headers={"Accept":"application/vnd.github+json"};
+if(tok)headers.Authorization="token "+tok;
+fetch("https://api.github.com/gists/"+gid,{headers:headers})
+.then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+.then(function(j){
+var f=j.files&&j.files["ff6-tracker-progress.json"];
+if(!f||!f.content){cb(null,"empty");return;}
+var remote;try{remote=JSON.parse(f.content);}catch(e){cb(null,"corrupt");return;}
+cb(remote,null);
+})
+.catch(function(e){cb(null,String((e&&e.message)||e));});
+}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function allKeys(){var a={};ROUTE.forEach(function(r){stopKeys(r).forEach(function(k){a[k]=1;});});return Object.keys(a);}
 function itemKey(g,it,i){var p=String(it).split("|");return p[1]?"b:"+p[1]:g.id+":"+i;}
@@ -706,8 +775,35 @@ h+='<tr data-key="'+k+'" style="cursor:pointer"><td class="nm" style="'+o.slice(
 });
 return h+'</tbody></table>';
 }
+function cloudCardHTML(){
+var tok=getToken(),gid=gistId();
+var statusText=!tok?"Not connected — paste a token below to enable automatic cloud backup."
+:CLOUD.status==="syncing"?"Syncing…"
+:CLOUD.status==="error"?"Sync error: "+esc(CLOUD.err)+" — check the token."
+:CLOUD.lastSync?"Synced "+Math.max(1,Math.round((Date.now()-CLOUD.lastSync)/1000))+"s ago."
+:"Connected. Waiting for the next change to sync.";
+var statusColor=!tok?"var(--ink-dim)":CLOUD.status==="error"?"var(--warn)":"var(--sealed)";
+var h='<div class="card"><h3>Cloud backup — automatic</h3>'
++'<p class="p">Progress pushes to a private GitHub Gist a few seconds after every change. If this device ever gets wiped — Safari "Clear Website Data," or removing and re-adding the Home Screen icon — reopening the tracker pulls your progress back down automatically. No code to copy, nothing to remember.</p>'
++'<p class="p" style="color:'+statusColor+'">'+statusText+'</p>';
+if(gid&&!GIST_ID_BUILTIN){
+h+='<p class="p">Gist ID: <code>'+esc(gid)+'</code></p>'
++'<p class="p" style="color:var(--warn)">Hand this ID off to get it baked into the app permanently. Until then it only lives in this device’s storage — a full wipe would take it with everything else, so recovery would not have anywhere to look.</p>';
+}
+h+='<p class="p">Needs a GitHub <b>classic</b> personal access token scoped to <code>gist</code> only, from <code>github.com/settings/tokens</code>. It is stored on this device and sent only to GitHub’s API.</p>'
++'<input id="gistTokenInput" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_..." style="width:100%;'
++'background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);border-radius:3px;'
++'padding:9px;font-family:var(--mono);font-size:11px;margin-top:6px;box-sizing:border-box">'
++'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
++'<button class="seg" data-act="cloud-token">'+(tok?"Update token":"Connect")+'</button>'
++(tok?'<button class="seg" data-act="cloud-sync-now">Sync now</button>'
++'<button class="seg" data-act="cloud-disconnect">Disconnect</button>':"")
++'</div></div>';
+return h;
+}
 function notesHTML(){
 return ''
++cloudCardHTML()
 +'<div class="card"><h3>Progress backup</h3>'
 +'<p class="p">Re-uploading index.html does <b>not</b> wipe progress. Clearing Safari website data or deleting the Home Screen icon <b>does</b>. Back up before either.</p>'
 +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
@@ -929,7 +1025,7 @@ if(a){
 var io=document.getElementById("io2"),msg=document.getElementById("msg2");
 var say=function(t){if(msg)msg.textContent=t;};
 if(a.dataset.act==="export"){
-var code=JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open});
+var code=JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated});
 if(io){io.value=code;io.select();}
 if(navigator.clipboard&&navigator.clipboard.writeText){
 navigator.clipboard.writeText(code).then(function(){say("Copied \u2014 paste it into Notes.");},
@@ -938,13 +1034,33 @@ else say("Select the text above and copy it.");
 return;}
 if(a.dataset.act==="import"){
 try{var q=JSON.parse(io.value);S.checked=q.checked||{};S.terra=q.terra||"Magic";
-S.celes=q.celes||"Strength";if(q.open)open=q.open;save();render();
+S.celes=q.celes||"Strength";S.assign=q.assign||{};if(q.open)open=q.open;
+S.updated=Date.now();save();render();
 document.getElementById("msg2").textContent="Progress restored.";}
 catch(err){say("That code could not be read.");}
 return;}
 if(a.dataset.act==="reset"){
 if(!confirm("Clear all tracked progress?"))return;
 S.checked={};save();render();return;}
+if(a.dataset.act==="cloud-token"){
+var tinp=document.getElementById("gistTokenInput");
+var tval=tinp?tinp.value.trim():"";
+if(!tval){say("Paste a token first.");return;}
+setToken(tval);
+say("Token saved \u2014 syncing\u2026");
+cloudPush();
+render();
+return;}
+if(a.dataset.act==="cloud-sync-now"){
+if(pushTimer){clearTimeout(pushTimer);pushTimer=null;}
+cloudPush();
+return;}
+if(a.dataset.act==="cloud-disconnect"){
+if(!confirm("Stop cloud backup on this device? The existing Gist backup is left untouched."))return;
+setToken("");
+CLOUD.status="idle";CLOUD.err="";
+render();
+return;}
 }
 var r=e.target.closest("[data-role]");
 if(r){S[r.dataset.role]=r.dataset.val;save();render();}
@@ -967,6 +1083,21 @@ function(){tab="notes";render();done("Open Notes and copy the code");});
 });
 })();
 render();
+cloudPull(function(remote,err){
+if(remote){
+var remoteUpdated=remote.updated||0;
+if(remoteUpdated>(S.updated||0)){
+S.checked=remote.checked||{};S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
+S.assign=remote.assign||{};S.updated=remoteUpdated;
+save();render();
+note("Restored progress from cloud backup.");
+}else if((S.updated||0)>remoteUpdated){
+scheduleCloudPush();
+}
+}else if(err&&gistId()&&!(S.updated>0)){
+note("A cloud backup exists but couldn't be reached — check your connection.");
+}
+});
 </script>
 </body>
 </html>

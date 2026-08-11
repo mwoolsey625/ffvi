@@ -268,15 +268,15 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 
 <main id="view"></main>
 
-<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build b7e4a19</div>
+<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build e91c2fa</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=b7e4a19"></script>
-<script src="data/rages.js?b=b7e4a19"></script>
-<script src="data/treasure.js?b=b7e4a19"></script>
-<script src="data/gear.js?b=b7e4a19"></script>
-<script src="data/bestiary.js?b=b7e4a19"></script>
-<script src="data/roster.js?b=b7e4a19"></script>
+<script src="data/route.js?b=e91c2fa"></script>
+<script src="data/rages.js?b=e91c2fa"></script>
+<script src="data/treasure.js?b=e91c2fa"></script>
+<script src="data/gear.js?b=e91c2fa"></script>
+<script src="data/bestiary.js?b=e91c2fa"></script>
+<script src="data/roster.js?b=e91c2fa"></script>
 
 <script>
 "use strict";
@@ -337,7 +337,7 @@ url="https://api.github.com/gists";method="POST";
 body=JSON.stringify({description:"FFVI PR Run Tracker \u2014 progress backup",public:false,
 files:{"ff6-tracker-progress.json":{content:statePayload()}}});
 }
-fetch(url,{method:method,headers:{"Authorization":"token "+tok,
+fetch(url,{method:method,keepalive:true,headers:{"Authorization":"token "+tok,
 "Accept":"application/vnd.github+json","Content-Type":"application/json"},body:body})
 .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
 .then(function(j){
@@ -1192,12 +1192,17 @@ syncFromCloud(false);
 /* Standalone Home Screen PWAs keep the page alive in the background instead
    of reloading it, so the normal load-time sync above never re-runs when you
    switch back in. Re-check on every return to foreground instead. */
+function flushPendingPush(){
+if(pushTimer){clearTimeout(pushTimer);pushTimer=null;cloudPush();}
+}
 document.addEventListener("visibilitychange",function(){
 if(document.visibilityState==="visible")syncFromCloud(false);
+else flushPendingPush();
 });
 window.addEventListener("pageshow",function(e){
 if(e.persisted)syncFromCloud(false);
 });
+window.addEventListener("pagehide",flushPendingPush);
 </script>
 </body>
 </html>

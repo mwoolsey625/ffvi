@@ -402,12 +402,12 @@ for(var k=0;k<bl.e.length;k++){ if(bl.e[k][0]===num) return true; }
 }
 return false;
 }
-/* Blanket "closes now" flags (wob/once/timed) only force urgency when nothing
-   later re-tracks the same entry. Missable/Rage-wanted/boss status is always
-   urgent regardless of what comes after. */
+/* Missable status and blanket "closes now" flags (wob/once/timed) only force
+   urgency when nothing later re-tracks the same entry. Rage-wanted/boss status
+   is always urgent regardless of what comes after. */
 function enemyUrgent(x,r,ri){
-if(MISSABLE[x[0]]||x[0]>=276||RAGEWANT[x[0]]) return true;
-if(!r[7]) return false;
+if(x[0]>=276||RAGEWANT[x[0]]) return true;
+if(!MISSABLE[x[0]]&&!r[7]) return false;
 return !laterEnemyOccurrence(x[0],ri);
 }
 function gateById(id){

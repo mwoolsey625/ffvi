@@ -264,19 +264,20 @@ details[open] summary{border-bottom:1px solid var(--hair)}
   <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
   <button role="tab" data-tab="rages" aria-selected="false">Rages</button>
   <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
+  <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
 </nav>
 
 <main id="view"></main>
 
-<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build e91c2fa</div>
+<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build f2a7d51</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=e91c2fa"></script>
-<script src="data/rages.js?b=e91c2fa"></script>
-<script src="data/treasure.js?b=e91c2fa"></script>
-<script src="data/gear.js?b=e91c2fa"></script>
-<script src="data/bestiary.js?b=e91c2fa"></script>
-<script src="data/roster.js?b=e91c2fa"></script>
+<script src="data/route.js?b=f2a7d51"></script>
+<script src="data/rages.js?b=f2a7d51"></script>
+<script src="data/treasure.js?b=f2a7d51"></script>
+<script src="data/gear.js?b=f2a7d51"></script>
+<script src="data/bestiary.js?b=f2a7d51"></script>
+<script src="data/roster.js?b=f2a7d51"></script>
 
 <script>
 "use strict";
@@ -312,13 +313,13 @@ scheduleCloudPush();}
    Home Screen icon removal \u2014 both clear every key at once, including
    any "previous version" copies kept in the same storage. A copy that
    lives outside the browser (a Gist) is the only thing that survives that. */
-var CLOUD={status:"idle",lastSync:0,err:""};
+var CLOUD={status:"idle",lastSync:0,err:"",pull:{status:"idle",err:"",at:0}};
 var pushTimer=null;
 function getToken(){try{return (CANSTORE&&localStorage.getItem(TOKEN_KEY))||"";}catch(e){return "";}}
 function setToken(t){try{if(!CANSTORE)return;if(t)localStorage.setItem(TOKEN_KEY,t);else localStorage.removeItem(TOKEN_KEY);}catch(e){}}
 function gistId(){if(GIST_ID_BUILTIN)return GIST_ID_BUILTIN;try{return (CANSTORE&&localStorage.getItem(GIST_KEY))||"";}catch(e){return "";}}
 function statePayload(){return JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,updated:S.updated});}
-function renderCloudStatus(){if(tab==="notes")render();}
+function renderCloudStatus(){if(tab==="settings")render();}
 function scheduleCloudPush(){
 if(!getToken())return;
 if(pushTimer)clearTimeout(pushTimer);
@@ -569,7 +570,7 @@ var eAll=en.map(function(x){return "b:"+x[0];});
 var eUrg=en.filter(isUrg).map(function(x){return "b:"+x[0];});
 var allDef=en.length>0&&eUrg.length===0,allUrg=en.length===0||eUrg.length===en.length;
 var est=en.length?stateOf(eUrg,eAll).s:2;
-var etag=en.length===0?null:(allDef?"SAFE TO DEFER":(est>=1?"NOTHING DUE":(allUrg?"GET NOW":eUrg.length+" DUE NOW")));
+var etag=en.length===0?null:(est===2?"CLEARED":(allDef?"SAFE TO DEFER":(est===1?"NOTHING DUE":(allUrg?"GET NOW":eUrg.length+" DUE NOW"))));
 var ecol=(allDef||est>=1)?"var(--sealed)":"var(--warn)";
 h+=sect("Enemies",en.length+bossAuto.length,ed+bossAuto.length,ecol,etag,ske,false,est,ecol);
 if(open[ske]){
@@ -621,8 +622,10 @@ ta.e.forEach(function(x,i){var k=tkey(ta.a,x,i);tAll.push(k);if(x[0]!=="W")tUrg.
 var allWait=tAll.length>0&&tUrg.length===0;
 var tst=stateOf(tUrg,tAll).s;
 if(allWait&&tst!==2) tst=1;
-var ttag=allWait?"ALL UPGRADE \u2014 LEAVE"
-:(tst===1?"NOTHING DUE":(tUrg.length&&tUrg.length<tAll.length?tUrg.length+" DUE NOW":null));
+var tUrgLeft=tUrg.filter(function(k){return !S.checked[k];}).length;
+var ttag=tst===2?"CLEARED"
+:(allWait?"ALL UPGRADE \u2014 LEAVE"
+:(tst===1?"NOTHING DUE":(tUrgLeft&&tUrgLeft<tAll.length?tUrgLeft+" DUE NOW":null)));
 var tcol=allWait?"var(--magicite)":"var(--sealed)";
 h+=sect("Treasure",tc,td,"var(--cyan)",ttag,skt,false,tst,tcol);
 if(open[skt]) r[6].forEach(function(ti){
@@ -855,9 +858,15 @@ var statusText=!tok?"Not connected — paste a token below to enable automatic c
 :CLOUD.lastSync?"Synced "+Math.max(1,Math.round((Date.now()-CLOUD.lastSync)/1000))+"s ago."
 :"Connected. Waiting for the next change to sync.";
 var statusColor=!tok?"var(--ink-dim)":CLOUD.status==="error"?"var(--warn)":"var(--sealed)";
+var pullText=!tok?"":
+CLOUD.pull.status==="error"?"Last pull failed: "+esc(CLOUD.pull.err)+" — this device's progress may be stale.":
+CLOUD.pull.status==="ok"?"Last pulled "+Math.max(1,Math.round((Date.now()-CLOUD.pull.at)/1000))+"s ago.":
+"Waiting for first pull.";
+var pullColor=CLOUD.pull.status==="error"?"var(--warn)":"var(--ink-dim)";
 var h='<div class="card"><h3>Cloud backup — automatic</h3>'
 +'<p class="p">Progress pushes to a private GitHub Gist a few seconds after every change. If this device ever gets wiped — Safari "Clear Website Data," or removing and re-adding the Home Screen icon — reopening the tracker pulls your progress back down automatically. No code to copy, nothing to remember.</p>'
-+'<p class="p" style="color:'+statusColor+'">'+statusText+'</p>';
++'<p class="p" style="color:'+statusColor+'">'+statusText+'</p>'
++(pullText?'<p class="p" style="color:'+pullColor+'">'+pullText+'</p>':"");
 if(gid&&!GIST_ID_BUILTIN){
 h+='<p class="p">Gist ID: <code>'+esc(gid)+'</code></p>'
 +'<p class="p" style="color:var(--warn)">Hand this ID off to get it baked into the app permanently. Until then it only lives in this device’s storage — a full wipe would take it with everything else, so recovery would not have anywhere to look.</p>';
@@ -879,7 +888,7 @@ return '<div class="card"><h3>Reload app</h3>'
 +'<p class="p">A Home Screen icon can keep showing an old copy of this page even after the tracker is updated. Force refresh below to pull a fresh copy of the app itself — it does not touch your tracked progress.</p>'
 +'<button class="seg" data-act="force-refresh">Force refresh</button></div>';
 }
-function notesHTML(){
+function settingsHTML(){
 return ''
 +cloudCardHTML()
 +reloadCardHTML()
@@ -892,7 +901,10 @@ return ''
 +'<textarea id="io2" spellcheck="false" placeholder="Progress code" style="width:100%;margin-top:10px;'
 +'background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);border-radius:3px;'
 +'padding:9px;font-family:var(--mono);font-size:11px;min-height:70px"></textarea>'
-+'<div class="p" id="msg2" style="color:var(--sealed);min-height:16px;margin-top:6px"></div></div>'
++'<div class="p" id="msg2" style="color:var(--sealed);min-height:16px;margin-top:6px"></div></div>';
+}
+function notesHTML(){
+return ''
 +'<details open><summary>Route merge — how this run differs</summary><div class="doc">'
 +'<h4>What this reconciles</h4>'
 +'<p>Two guides that were never written to work together. <b>Simmeh\'s Low Level/Perfect Stats Walkthrough</b> (Steam) gives boss strategy and level discipline but explicitly disclaims bestiary coverage. <b>bover_87\'s Missable Item Walkthrough</b> (GameFAQs) gives the cutoffs but knows nothing about level-locking. Where one says skip and the other says kill, the Gates tab already resolves it.</p>'
@@ -1084,7 +1096,7 @@ function render(){
 renderHead();
 document.getElementById("view").innerHTML =
 tab==="route"?routeHTML():tab==="gear"?gearHTML():tab==="coli"?coliHTML():tab==="levels"?levelsHTML():
-tab==="rages"?ragesHTML():notesHTML();
+tab==="rages"?ragesHTML():tab==="settings"?settingsHTML():notesHTML();
 }
 document.querySelector("nav").addEventListener("click",function(e){
 var b=e.target.closest("button[data-tab]");if(!b)return;
@@ -1172,6 +1184,7 @@ function syncFromCloud(manual){
 if(manual)note("Checking cloud backup…");
 cloudPull(function(remote,err){
 if(remote){
+CLOUD.pull={status:"ok",err:"",at:Date.now()};
 var remoteUpdated=remote.updated||0;
 if(remoteUpdated>(S.updated||0)){
 S.checked=remote.checked||{};S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
@@ -1182,9 +1195,11 @@ note("Pulled newer progress from cloud.");
 if((S.updated||0)>remoteUpdated)scheduleCloudPush();
 if(manual)note("Already up to date.");
 }
+renderCloudStatus();
 }else if(err){
-if(manual)note("Could not reach cloud backup — check your connection.");
-else if(gistId()&&!(S.updated>0))note("A cloud backup exists but couldn't be reached — check your connection.");
+CLOUD.pull={status:"error",err:String(err),at:Date.now()};
+note(manual?"Could not reach cloud backup — check your connection.":"Cloud sync failed — check Settings.");
+renderCloudStatus();
 }
 });
 }

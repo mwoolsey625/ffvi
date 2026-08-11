@@ -268,15 +268,15 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 
 <main id="view"></main>
 
-<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build 0f2a911</div>
+<div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build b7e4a19</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js"></script>
-<script src="data/rages.js"></script>
-<script src="data/treasure.js"></script>
-<script src="data/gear.js"></script>
-<script src="data/bestiary.js"></script>
-<script src="data/roster.js"></script>
+<script src="data/route.js?b=b7e4a19"></script>
+<script src="data/rages.js?b=b7e4a19"></script>
+<script src="data/treasure.js?b=b7e4a19"></script>
+<script src="data/gear.js?b=b7e4a19"></script>
+<script src="data/bestiary.js?b=b7e4a19"></script>
+<script src="data/roster.js?b=b7e4a19"></script>
 
 <script>
 "use strict";
@@ -868,14 +868,21 @@ h+='<p class="p">Needs a GitHub <b>classic</b> personal access token scoped to <
 +'padding:9px;font-family:var(--mono);font-size:11px;margin-top:6px;box-sizing:border-box">'
 +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
 +'<button class="seg" data-act="cloud-token">'+(tok?"Update token":"Connect")+'</button>'
-+(tok?'<button class="seg" data-act="cloud-sync-now">Sync now</button>'
++(tok?'<button class="seg" data-act="cloud-pull-now">Pull latest</button>'
++'<button class="seg" data-act="cloud-sync-now">Push now</button>'
 +'<button class="seg" data-act="cloud-disconnect">Disconnect</button>':"")
 +'</div></div>';
 return h;
 }
+function reloadCardHTML(){
+return '<div class="card"><h3>Reload app</h3>'
++'<p class="p">A Home Screen icon can keep showing an old copy of this page even after the tracker is updated. Force refresh below to pull a fresh copy of the app itself — it does not touch your tracked progress.</p>'
++'<button class="seg" data-act="force-refresh">Force refresh</button></div>';
+}
 function notesHTML(){
 return ''
 +cloudCardHTML()
++reloadCardHTML()
 +'<div class="card"><h3>Progress backup</h3>'
 +'<p class="p">Re-uploading index.html does <b>not</b> wipe progress. Clearing Safari website data or deleting the Home Screen icon <b>does</b>. Back up before either.</p>'
 +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
@@ -1127,11 +1134,17 @@ if(a.dataset.act==="cloud-sync-now"){
 if(pushTimer){clearTimeout(pushTimer);pushTimer=null;}
 cloudPush();
 return;}
+if(a.dataset.act==="cloud-pull-now"){
+syncFromCloud(true);
+return;}
 if(a.dataset.act==="cloud-disconnect"){
 if(!confirm("Stop cloud backup on this device? The existing Gist backup is left untouched."))return;
 setToken("");
 CLOUD.status="idle";CLOUD.err="";
 render();
+return;}
+if(a.dataset.act==="force-refresh"){
+location.href=location.pathname+"?r="+Date.now();
 return;}
 }
 var r=e.target.closest("[data-role]");
@@ -1155,6 +1168,8 @@ function(){tab="notes";render();done("Open Notes and copy the code");});
 });
 })();
 render();
+function syncFromCloud(manual){
+if(manual)note("Checking cloud backup…");
 cloudPull(function(remote,err){
 if(remote){
 var remoteUpdated=remote.updated||0;
@@ -1162,13 +1177,26 @@ if(remoteUpdated>(S.updated||0)){
 S.checked=remote.checked||{};S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
 S.assign=remote.assign||{};S.updated=remoteUpdated;
 save();render();
-note("Restored progress from cloud backup.");
-}else if((S.updated||0)>remoteUpdated){
-scheduleCloudPush();
+note("Pulled newer progress from cloud.");
+}else{
+if((S.updated||0)>remoteUpdated)scheduleCloudPush();
+if(manual)note("Already up to date.");
 }
-}else if(err&&gistId()&&!(S.updated>0)){
-note("A cloud backup exists but couldn't be reached — check your connection.");
+}else if(err){
+if(manual)note("Could not reach cloud backup — check your connection.");
+else if(gistId()&&!(S.updated>0))note("A cloud backup exists but couldn't be reached — check your connection.");
 }
+});
+}
+syncFromCloud(false);
+/* Standalone Home Screen PWAs keep the page alive in the background instead
+   of reloading it, so the normal load-time sync above never re-runs when you
+   switch back in. Re-check on every return to foreground instead. */
+document.addEventListener("visibilitychange",function(){
+if(document.visibilityState==="visible")syncFromCloud(false);
+});
+window.addEventListener("pageshow",function(e){
+if(e.persisted)syncFromCloud(false);
 });
 </script>
 </body>

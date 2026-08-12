@@ -274,8 +274,7 @@ details[open] summary{border-bottom:1px solid var(--hair)}
   <button role="tab" data-tab="levels" aria-selected="false">Levels</button>
   <button role="tab" data-tab="gear" aria-selected="false">Gear</button>
   <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
-  <button role="tab" data-tab="rages" aria-selected="false">Rages</button>
-  <button role="tab" data-tab="veldt" aria-selected="false">Veldt</button>
+  <button role="tab" data-tab="veldt" aria-selected="false">Veldt & Rages</button>
   <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
   <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
 </nav>
@@ -836,7 +835,7 @@ h+='<div class="card" style="margin-top:14px"><h3>Why Gau skips</h3>'
 +'<p class="p">Everyone else has 37–52 spare levels after capping their primary. For them the HP and MP windows are free.</p></div>';
 return h;
 }
-function ragesHTML(){
+function ragesBodyHTML(){
 var h='<div class="card"><h3 style="color:var(--sealed)">Order of operations</h3>'
 +'<p class="p">Every formation you defeat is added to the Veldt pool, and a fuller pool means longer hunts for the Rage you actually want. So the order matters more than the totals.</p>'
 +'<p class="p"><b>1.</b> In areas that close, take everything \u2014 you get no second chance.<br>'
@@ -858,11 +857,19 @@ RAGES.forEach(function(r){
 var k="rage:"+r.n,on=!!S.checked[k],o=on?';opacity:.5':"";
 h+='<tr data-key="'+k+'" style="cursor:pointer"><td class="nm" style="'+o.slice(1)+'">'
 +'<span style="color:'+(on?"var(--sealed)":"var(--rule)")+'">'+(on?"✓ ":"□ ")+'</span>'+esc(r.n)
-+(r.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WOB ONLY</span>':"")
 +'<span class="sub">'+esc(r.w)+'</span></td>'
 +'<td style="'+o.slice(1)+'">'+esc(r.g)+'</td><td style="'+o.slice(1)+'">'+esc(r.a)+'</td></tr>';
 });
 return h+'</tbody></table>';
+}
+function ragesGateHTML(){
+  var isOpen=!!open["vrages"];
+  var h='<div class="gate">';
+  h+='<button class="gate-head" data-gate="vrages" aria-expanded="'+isOpen+'">';
+  h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">Rages</span></button>';
+  if(isOpen) h+='<div class="gbody">'+ragesBodyHTML()+'</div>';
+  h+='</div>';
+  return h;
 }
 function veldtSlotKnown(slot){
   var mons=slot.m||slot;
@@ -888,14 +895,13 @@ function veldtTrackingHTML(){
   h+='<span class="tally">'+RAGES.filter(function(r){return !!S.checked["rage:"+r.n];}).length+'/'+RAGES.length+' banked</span></button>';
   if(isOpen){
     h+='<div class="gbody">';
-    h+='<div class="sect-note">Front-load these before the Veldt pool gets crowded — see the Rages tab for why. Checking a rage off here stays in sync with the Rages tab, and marks every group below that carries it with a ◎ TARGET tag.</div>';
+    h+='<div class="sect-note">Front-load these before the Veldt pool gets crowded — see the Rages section above for why. Checking a rage off here stays in sync with that table, and marks every group below that carries it with a ◎ TARGET tag.</div>';
     RAGES.forEach(function(r){
       var on=!!S.checked["rage:"+r.n];
       var hits=veldtHits(r.num);
       var noHits=on&&hits.length===0;
       h+='<button class="item'+(on?" on":"")+(noHits?" no-hits":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'">'
       +'<span class="box">'+(on?"✓":"")+'</span><span>'+esc(r.n)
-      +(r.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WOB ONLY</span>':"")
       +(noHits?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">⚠ NO VELDT FORMATION FOUND</span>':"")
       +'<span class="sub">'+esc(r.a)+' · '+esc(r.w)+' · '+hits.length+' formation'+(hits.length===1?"":"s")+(hits.length?' (groups '+hits.map(function(x){return x.pn;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+')':'')+'</span>'
       +'</span></button>';
@@ -905,17 +911,32 @@ function veldtTrackingHTML(){
   h+='</div>';
   return h;
 }
-function veldtHTML(){
+function veldtInfoHTML(){
+  var isOpen=!!open["vinfo"];
   var emptyGroups=VELDT.filter(function(p){return p.e;}).map(function(p){return p.n;}).join(', ');
-  var h='<div class="card"><h3>How to read this</h3>'
-  +'<p class="p">64 groups of 8 formation slots. Each Veldt battle advances the group by one; within a group the game rolls a slot 0–7 and walks forward until it lands on one you have actually fought. Groups with no formations at all (<b>'+esc(emptyGroups)+'</b>) are always skipped entirely.</p>'
-  +'<p class="p">See the <b>Rages</b> tab for how group advancement and reloading actually work — this tab is just the reference table of what lives in each group.</p>'
-  +'<p class="p"><b style="color:var(--magicite)">RAGE WANTED</b> and <b style="color:var(--warn)">MISSABLE</b> tags mirror the flags used on the Route and Bestiary tabs.</p>'
-  +'<p class="p">The <b>X/Y known</b> tally per group is scoped to you: <b>Y</b> is how many of the 8 slots this app has formation data for; <b>X</b> is how many of those you have actually beaten, per your Bestiary check-offs (a slot counts once every monster in it is checked off there). Slots with a monster that has no PR bestiary entry can never show as known, since there is nothing to check off.</p></div>';
+  var h='<div class="gate">';
+  h+='<button class="gate-head" data-gate="vinfo" aria-expanded="'+isOpen+'">';
+  h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">Veldt Info</span></button>';
+  if(isOpen){
+    h+='<div class="gbody">';
+    h+='<div class="card"><h3>How to read this</h3>'
+    +'<p class="p">64 groups of 8 formation slots. Each Veldt battle advances the group by one; within a group the game rolls a slot 0–7 and walks forward until it lands on one you have actually fought. Groups with no formations at all (<b>'+esc(emptyGroups)+'</b>) are always skipped entirely.</p>'
+    +'<p class="p">See the <b>Rages</b> section below for how group advancement and reloading actually work — this card is just the reference table of what lives in each group.</p>'
+    +'<p class="p"><b style="color:var(--magicite)">RAGE WANTED</b> and <b style="color:var(--warn)">MISSABLE</b> tags mirror the flags used on the Route and Bestiary tabs.</p>'
+    +'<p class="p">The <b>X/Y known</b> tally per group is scoped to you: <b>Y</b> is how many of the 8 slots this app has formation data for; <b>X</b> is how many of those you have actually beaten, per your Bestiary check-offs (a slot counts once every monster in it is checked off there). Slots with a monster that has no PR bestiary entry can never show as known, since there is nothing to check off.</p></div>';
 
-  h+='<div class="card"><h3 style="color:var(--warn)">Verified against Pixel Remaster, not just GBA</h3>'
-  +'<p class="p">Formation composition (which monsters and quantities share a slot) was cross-checked against three independent sources — the Final Fantasy Wiki\'s formation table, rpglegion.com\'s algorithmic Veldt reference, and a slot-indexed GBA walkthrough FAQ whose monster names happen to match PR\'s translation — rather than trusting any single one. That caught <b>18 real transcription errors</b> (wrong quantities, a swapped pair, a couple of slots that had drifted into the wrong group) that a single-source check would have missed, since two of the three sources also had their own isolated mistakes. Every matched monster name was verified against bover_87\'s Pixel-Remaster-specific bestiary checklist — the same source this app already cites elsewhere — not the GBA fan list the raw formation data was transcribed from.</p>'
-  +'<p class="p"><b>Doberman, Gigantos, Dark Side, Specter, Eukaryote</b> genuinely have no PR bestiary entry at all (confirmed absent from bover_87\'s full 362-entry PR list, not just missing from this app\'s Bestiary tab) — shown here by name only. <b>Behemoth King (undead)</b> — #318 — and <b>Holy Dragon</b> — #344 — do have real PR bestiary numbers per that same list; this app\'s Bestiary tab just doesn\'t track them yet since its scope stops at #287. <b>Death Warden</b>\'s slot in group 16 needs the Soul Shrine, which Pixel Remaster does not have — treat it as permanently empty.</p></div>';
+    h+='<div class="card"><h3 style="color:var(--warn)">Verified against Pixel Remaster, not just GBA</h3>'
+    +'<p class="p">Formation composition (which monsters and quantities share a slot) was cross-checked against three independent sources — the Final Fantasy Wiki\'s formation table, rpglegion.com\'s algorithmic Veldt reference, and a slot-indexed GBA walkthrough FAQ whose monster names happen to match PR\'s translation — rather than trusting any single one. That caught <b>18 real transcription errors</b> (wrong quantities, a swapped pair, a couple of slots that had drifted into the wrong group) that a single-source check would have missed, since two of the three sources also had their own isolated mistakes. Every matched monster name was verified against bover_87\'s Pixel-Remaster-specific bestiary checklist — the same source this app already cites elsewhere — not the GBA fan list the raw formation data was transcribed from.</p>'
+    +'<p class="p"><b>Doberman, Gigantos, Dark Side, Specter, Eukaryote</b> genuinely have no PR bestiary entry at all (confirmed absent from bover_87\'s full 362-entry PR list, not just missing from this app\'s Bestiary tab) — shown here by name only. <b>Behemoth King (undead)</b> — #318 — and <b>Holy Dragon</b> — #344 — do have real PR bestiary numbers per that same list; this app\'s Bestiary tab just doesn\'t track them yet since its scope stops at #287. <b>Death Warden</b>\'s slot in group 16 needs the Soul Shrine, which Pixel Remaster does not have — treat it as permanently empty.</p></div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function veldtHTML(){
+  var h=veldtInfoHTML();
+
+  h+=ragesGateHTML();
 
   h+=veldtTrackingHTML();
 
@@ -1029,7 +1050,7 @@ return ''
 +'<h4>What this reconciles</h4>'
 +'<p>Two guides that were never written to work together. <b>Simmeh\'s Low Level/Perfect Stats Walkthrough</b> (Steam) gives boss strategy and level discipline but explicitly disclaims bestiary coverage. <b>bover_87\'s Missable Item Walkthrough</b> (GameFAQs) gives the cutoffs but knows nothing about level-locking. Where one says skip and the other says kill, the Gates tab already resolves it.</p>'
 +'<h4>The core reframe</h4>'
-+'<p>Simmeh keeps encounters <b>off</b> all game to limit Veldt entropy so Gau\'s Rages stay findable. A full bestiary wants the opposite. Accept the congested Veldt — it is the price of the run. Mitigate by front-loading the eight Rages on the Rages tab.</p>'
++'<p>Simmeh keeps encounters <b>off</b> all game to limit Veldt entropy so Gau\'s Rages stay findable. A full bestiary wants the opposite. Accept the congested Veldt — it is the price of the run. Mitigate by front-loading the eight Rages on the Veldt & Rages tab.</p>'
 +'<p>With EXP at 0x, extra combat is <b>free</b>. Nothing about fighting more threatens the stat plan during Phase I. The threat is dying at level 5.</p>'
 +'<h4>Phase I survival pattern</h4>'
 +'<p>Gobbledygook Rage to Vanish the party, or the Phantom esper once you have it. An Invisible party is immune to physicals, which trivialises most low-level grinding. Simmeh uses this only for Number 024 and the Esper Cave — use it far more broadly.</p>'
@@ -1216,7 +1237,7 @@ function render(){
 renderHead();
 document.getElementById("view").innerHTML =
 tab==="route"?routeHTML():tab==="gear"?gearHTML():tab==="coli"?coliHTML():tab==="levels"?levelsHTML():
-tab==="rages"?ragesHTML():tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():notesHTML();
+tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():notesHTML();
 }
 document.querySelector("nav").addEventListener("click",function(e){
 var b=e.target.closest("button[data-tab]");if(!b)return;

@@ -1,5 +1,5 @@
 var RAGES=[
-{n:"Stray Cat",num:32,g:"Grp 7 · 8",a:"Cat Scratch",w:"Gau's strongest physical Rage — x4 damage, single target",m:1},
+{n:"Stray Cat",num:32,g:"Grp 7 · 8",a:"Cat Scratch",w:"Gau's strongest physical Rage — x4 damage, single target"},
 {n:"Guard Leader",num:278,g:"1",a:"Wind Slash",w:"FC approach crowd clear"},
 {n:"Trillium",num:18,g:"4",a:"Bio",w:"Dadaluma, Imperial Elite"},
 {n:"Ghost",num:40,g:"9",a:"Thundara",w:"Serpent Trench, No. 128"},

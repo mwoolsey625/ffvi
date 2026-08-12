@@ -177,6 +177,8 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);out
 }
 .item.on .box{background:var(--sealed);border-color:var(--sealed);box-shadow:0 0 10px -2px rgba(79,211,166,.6)}
 .item.on span:last-child{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}
+.item.no-hits{border-left:3px solid var(--warn);background:rgba(245,182,94,.06);border-radius:0 var(--r-md) var(--r-md) 0}
+.item.no-hits span:last-child{color:var(--ink);text-decoration:none}
 .item.auto{cursor:default}
 .item.auto:active{background:transparent}
 .item.auto .box{border-radius:50%}
@@ -894,12 +896,14 @@ function veldtTrackingHTML(){
       var on=!!S.checked["rage:"+r.n];
       var focused=veldtFocus===r.num;
       var hits=veldtHits(r.num);
-      h+='<button class="item'+(on?" on":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'"'
+      var noHits=on&&hits.length===0;
+      h+='<button class="item'+(on?" on":"")+(noHits?" no-hits":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'"'
       +(focused?' style="background:rgba(169,140,240,.1)"':'')+'>'
       +'<span class="box">'+(on?"✓":"")+'</span><span>'+esc(r.n)
       +(r.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WOB ONLY</span>':"")
       +(focused?' <span style="color:var(--magicite);font-size:9px;letter-spacing:.1em">◎ SHOWING BELOW</span>':"")
-      +'<span class="sub">'+esc(r.a)+' · '+esc(r.w)+' · '+hits.length+' formation'+(hits.length===1?"":"s")+' (groups '+hits.map(function(x){return x.pn;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+')</span>'
+      +(noHits?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">⚠ NO VELDT FORMATION FOUND</span>':"")
+      +'<span class="sub">'+esc(r.a)+' · '+esc(r.w)+' · '+hits.length+' formation'+(hits.length===1?"":"s")+(hits.length?' (groups '+hits.map(function(x){return x.pn;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+')':'')+'</span>'
       +'</span></button>';
     });
     h+='</div>';

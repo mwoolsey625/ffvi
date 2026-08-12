@@ -306,7 +306,6 @@ var TOKEN_KEY = "ff6pr-gist-token";
    \u2014 including the copy of the ID normally cached there \u2014 is gone. */
 var GIST_ID_BUILTIN = "596d1edfb7763ac049884fc4b5058b2d";
 var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={};
-var veldtFocus=null;
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
 var LOADFAIL=false;
 if(CANSTORE){var raw=localStorage.getItem(KEY);
@@ -867,6 +866,10 @@ h+='<tr data-key="'+k+'" style="cursor:pointer"><td class="nm" style="'+o.slice(
 });
 return h+'</tbody></table>';
 }
+function veldtSlotKnown(slot){
+  var mons=slot.m||slot;
+  return mons.every(function(mm){return mm[2]!=null&&!!S.checked["b:"+mm[2]];});
+}
 function veldtHits(num){
   var out=[];
   VELDT.forEach(function(p,gi){
@@ -887,21 +890,14 @@ function veldtTrackingHTML(){
   h+='<span class="tally">'+RAGES.filter(function(r){return !!S.checked["rage:"+r.n];}).length+'/'+RAGES.length+' banked</span></button>';
   if(isOpen){
     h+='<div class="gbody">';
-    h+='<div class="sect-note">Front-load these before the Veldt pool gets crowded — see the Rages tab for why. Click a row to see exactly which groups carry it below; checking it off here stays in sync with the Rages tab.</div>';
-    if(veldtFocus!=null){
-      var fr=RAGES.find(function(r){return r.num===veldtFocus;});
-      h+='<div class="warn">Highlighting <b>'+esc(fr?fr.n:veldtFocus)+'</b> below. <span data-act="veldt-clear-focus" style="text-decoration:underline;cursor:pointer">Clear</span></div>';
-    }
+    h+='<div class="sect-note">Front-load these before the Veldt pool gets crowded — see the Rages tab for why. Checking a rage off here stays in sync with the Rages tab, and marks every group below that carries it with a ◎ TARGET tag.</div>';
     RAGES.forEach(function(r){
       var on=!!S.checked["rage:"+r.n];
-      var focused=veldtFocus===r.num;
       var hits=veldtHits(r.num);
       var noHits=on&&hits.length===0;
-      h+='<button class="item'+(on?" on":"")+(noHits?" no-hits":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'"'
-      +(focused?' style="background:rgba(169,140,240,.1)"':'')+'>'
+      h+='<button class="item'+(on?" on":"")+(noHits?" no-hits":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'">'
       +'<span class="box">'+(on?"✓":"")+'</span><span>'+esc(r.n)
       +(r.m?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WOB ONLY</span>':"")
-      +(focused?' <span style="color:var(--magicite);font-size:9px;letter-spacing:.1em">◎ SHOWING BELOW</span>':"")
       +(noHits?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">⚠ NO VELDT FORMATION FOUND</span>':"")
       +'<span class="sub">'+esc(r.a)+' · '+esc(r.w)+' · '+hits.length+' formation'+(hits.length===1?"":"s")+(hits.length?' (groups '+hits.map(function(x){return x.pn;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(", ")+')':'')+'</span>'
       +'</span></button>';
@@ -916,13 +912,17 @@ function veldtHTML(){
   var h='<div class="card"><h3>How to read this</h3>'
   +'<p class="p">64 groups of 8 formation slots. Each Veldt battle advances the group by one; within a group the game rolls a slot 0–7 and walks forward until it lands on one you have actually fought. Groups with no formations at all (<b>'+esc(emptyGroups)+'</b>) are always skipped entirely.</p>'
   +'<p class="p">See the <b>Rages</b> tab for how group advancement and reloading actually work — this tab is just the reference table of what lives in each group.</p>'
-  +'<p class="p"><b style="color:var(--magicite)">RAGE WANTED</b> and <b style="color:var(--warn)">MISSABLE</b> tags mirror the flags used on the Route and Bestiary tabs.</p></div>';
+  +'<p class="p"><b style="color:var(--magicite)">RAGE WANTED</b> and <b style="color:var(--warn)">MISSABLE</b> tags mirror the flags used on the Route and Bestiary tabs.</p>'
+  +'<p class="p">The <b>X/Y known</b> tally per group is scoped to you: <b>Y</b> is how many of the 8 slots this app has formation data for; <b>X</b> is how many of those you have actually beaten, per your Bestiary check-offs (a slot counts once every monster in it is checked off there). Slots with a monster that has no PR bestiary entry can never show as known, since there is nothing to check off.</p></div>';
 
   h+='<div class="card"><h3 style="color:var(--warn)">Verified against Pixel Remaster, not just GBA</h3>'
   +'<p class="p">Formation composition (which monsters share a group/slot) was cross-checked two ways: PR players on the GameFAQs PR board confirm group contents match the SNES/GBA lineage exactly (a Battle-of-Narshe check against groups 11–12 lined up). Every matched monster name below was verified against bover_87\'s Pixel-Remaster-specific bestiary checklist — the same source this app already cites elsewhere — not the GBA fan list the raw formation data was transcribed from.</p>'
   +'<p class="p"><b>Doberman, Gigantos, GreaseMonk, Dark Side, Specter, Eukaryote</b> genuinely have no PR bestiary entry at all (confirmed absent from bover_87\'s full 362-entry PR list, not just missing from this app\'s Bestiary tab) — shown here by name only. <b>Behemoth King (undead)</b> — #318 — and <b>Holy Dragon</b> — #344 — do have real PR bestiary numbers per that same list; this app\'s Bestiary tab just doesn\'t track them yet since its scope stops at #287. <b>Death Warden</b>\'s slot in group 16 needs the Soul Shrine, which Pixel Remaster does not have — treat it as permanently empty.</p></div>';
 
   h+=veldtTrackingHTML();
+
+  var trackedNums={};
+  RAGES.forEach(function(r){if(S.checked["rage:"+r.n])trackedNums[r.num]=1;});
 
   VELDT.forEach(function(p,gi){
     if(p.e){
@@ -931,23 +931,26 @@ function veldtHTML(){
       +'<span class="stamp" style="border-color:var(--rule-dim);color:var(--ink-dim)">NO FORMATIONS</span></div></div>';
       return;
     }
-    var isHit=veldtFocus!=null&&p.s.some(function(slot){return slot&&(slot.m||slot).some(function(mm){return mm[2]===veldtFocus;});});
-    var isOpen=!!open["v"+gi]||isHit;
+    var isHit=p.s.some(function(slot){return slot&&(slot.m||slot).some(function(mm){return mm[2]!=null&&trackedNums[mm[2]];});});
+    var isOpen=!!open["v"+gi];
     var filledCount=p.s.filter(function(s){return !!s;}).length;
+    var knownCount=p.s.filter(function(s){return s&&veldtSlotKnown(s);}).length;
     h+='<div class="gate'+(isHit?" veldt-hit":"")+'">';
     h+='<button class="gate-head" data-gate="v'+gi+'" aria-expanded="'+isOpen+'">';
     h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">Group '+p.n+'</span>';
     h+=isHit?'<span class="stamp" style="border-color:var(--magicite);color:var(--magicite)">◎ TARGET</span>':'';
-    h+='<span class="tally">'+filledCount+'/8 known</span></button>';
+    h+='<span class="tally">'+knownCount+'/'+filledCount+' known</span></button>';
     if(isOpen){
       h+='<div class="gbody">';
       h+='<table><thead><tr><th style="width:34px">Slot</th><th>Formation</th></tr></thead><tbody>';
       p.s.forEach(function(slot,si){
         var mons=slot?(slot.m||slot):null;
         var note=slot&&slot.note;
+        var sKnown=slot&&veldtSlotKnown(slot);
         h+='<tr><td class="nm" style="color:var(--ink-dim)">'+si+'</td><td>';
         if(!mons){ h+='<span style="color:var(--rule-dim)">—</span>'; }
         else{
+          h+='<span style="color:'+(sKnown?"var(--sealed)":"var(--rule-dim)")+'">'+(sKnown?"✓ ":"□ ")+'</span>';
           h+=mons.map(function(mm){
             var qty=mm[0],nm=mm[1],num=mm[2];
             var tag='';
@@ -956,7 +959,7 @@ function veldtHTML(){
               if(MISSABLE[num]) tag+=' <span style="color:var(--warn);font-size:9px;letter-spacing:.08em">MISSABLE</span>';
             }
             var label=(qty>1?qty+'× ':'')+esc(nm)+tag;
-            if(num!=null&&num===veldtFocus) label='<span style="background:rgba(169,140,240,.25);border-radius:4px;padding:1px 4px">'+label+'</span>';
+            if(num!=null&&trackedNums[num]) label='<span style="background:rgba(169,140,240,.25);border-radius:4px;padding:1px 4px">'+label+'</span>';
             return label;
           }).join(', ');
           if(note) h+='<span class="sub">'+esc(note)+'</span>';
@@ -1227,10 +1230,7 @@ document.getElementById("view").addEventListener("click",function(e){
 var rg=e.target.closest("[data-rage]");
 if(rg){
 S.checked["rage:"+rg.dataset.rname]=!S.checked["rage:"+rg.dataset.rname];
-veldtFocus=Number(rg.dataset.rage);
 save();render();
-var hitEl=document.querySelector(".veldt-hit");
-if(hitEl) hitEl.scrollIntoView({behavior:"smooth",block:"center"});
 return;}
 var g=e.target.closest("[data-gate]");
 if(g){open[g.dataset.gate]=!open[g.dataset.gate];render();return;}
@@ -1240,7 +1240,6 @@ var u=e.target.closest("[data-uk]");
 if(u){S.assign=S.assign||{};S.assign[u.dataset.uk]=u.dataset.uc;save();render();return;}
 var a=e.target.closest("[data-act]");
 if(a){
-if(a.dataset.act==="veldt-clear-focus"){veldtFocus=null;render();return;}
 var io=document.getElementById("io2"),msg=document.getElementById("msg2");
 var say=function(t){if(msg)msg.textContent=t;};
 if(a.dataset.act==="export"){

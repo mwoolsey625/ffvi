@@ -66,30 +66,28 @@ h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
 
 /* ---------- tabs ---------- */
 nav{
-  display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px;
-  padding:5px;border-radius:var(--r-lg);
-  background:rgba(255,255,255,.035);border:1px solid var(--hair);
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.3);
+  position:sticky;top:env(safe-area-inset-top);z-index:20;
+  display:flex;flex-wrap:nowrap;gap:5px;margin:0 -14px 20px;
+  padding:5px 14px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;scrollbar-width:none;
+  background:rgba(10,15,38,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hair);
+  box-shadow:0 8px 18px -12px rgba(0,0,0,.6);
 }
+nav::-webkit-scrollbar{display:none}
 nav button{
-  flex:1 1 28%;min-height:42px;padding:10px 4px;
+  flex:0 0 auto;min-height:42px;padding:10px 14px;
   background:transparent;color:var(--ink-dim);
   border:1px solid transparent;border-radius:var(--r-md);
   font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  cursor:pointer;transition:background var(--t),color var(--t),box-shadow var(--t);
+  cursor:pointer;white-space:nowrap;scroll-snap-align:start;
+  transition:background var(--t),color var(--t),box-shadow var(--t);
 }
 nav button[aria-selected="true"]{
   background:linear-gradient(180deg,var(--panel2),#19214A);
   color:var(--ink);border-color:var(--hair);
   box-shadow:var(--sh),var(--gloss);
-}
-@media (max-width:560px){
-  nav{
-    flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    scroll-snap-type:x proximity;scrollbar-width:none;
-  }
-  nav::-webkit-scrollbar{display:none}
-  nav button{flex:0 0 auto;padding:10px 14px;scroll-snap-align:start;white-space:nowrap}
 }
 button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);outline-offset:2px;border-radius:var(--r-sm)}
 

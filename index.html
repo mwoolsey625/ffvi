@@ -51,6 +51,11 @@ header{border-bottom:1px solid var(--hair);padding-bottom:16px;margin-bottom:18p
 .titlerow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .titlerow h1{flex:1;margin:0}
 h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
+.hdrtab{
+  flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--magicite);background:rgba(169,140,240,.12);border:1px solid rgba(169,140,240,.35);
+  border-radius:99px;padding:5px 10px;
+}
 #hdrbk{
   flex:none;padding:10px 14px;min-height:40px;
   background:linear-gradient(180deg,var(--panel2),#18204A);
@@ -65,34 +70,39 @@ h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
 .count{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:8px;letter-spacing:.05em}
 
 /* ---------- tabs ---------- */
-nav{
-  position:sticky;top:env(safe-area-inset-top);z-index:20;
-  display:flex;flex-wrap:nowrap;gap:5px;margin:0 -14px 20px;
-  padding:5px 0 5px 14px;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  background:rgba(10,15,38,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--hair);
-  box-shadow:0 8px 18px -12px rgba(0,0,0,.6);
+#navBackdrop{
+  position:fixed;inset:0;background:rgba(4,7,20,.5);z-index:35;
+  opacity:0;transition:opacity var(--t);pointer-events:none;
 }
-nav::-webkit-scrollbar{display:none}
-/* A real flex item, not container padding — Safari/WebKit drops the
-   trailing edge of padding on a horizontally scrolling flex container,
-   so the last tab's label would otherwise touch the screen edge. */
-nav::after{content:"";flex:0 0 9px}
-nav button{
-  flex:0 0 auto;min-height:42px;padding:10px 14px;
-  background:transparent;color:var(--ink-dim);
-  border:1px solid transparent;border-radius:var(--r-md);
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  cursor:pointer;white-space:nowrap;
-  transition:background var(--t),color var(--t),box-shadow var(--t);
-}
-nav button[aria-selected="true"]{
+#navBackdrop.show{opacity:1;pointer-events:auto}
+#navFab{
+  position:fixed;z-index:41;
+  right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));
+  width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,var(--panel2),#19214A);
-  color:var(--ink);border-color:var(--hair);
-  box-shadow:var(--sh),var(--gloss);
+  border:1px solid var(--hair);color:var(--magicite);font-size:19px;
+  box-shadow:var(--sh),0 10px 24px -8px rgba(0,0,0,.65);
+  cursor:pointer;transition:transform var(--t),color var(--t),box-shadow var(--t);
 }
+#navFab:active{transform:scale(.94)}
+#navFab[aria-expanded="true"]{color:var(--ink);box-shadow:var(--sh),0 0 0 3px rgba(169,140,240,.3)}
+#navList{
+  position:fixed;z-index:40;
+  right:calc(18px + env(safe-area-inset-right));bottom:calc(82px + env(safe-area-inset-bottom));
+  width:min(230px,calc(100vw - 36px));
+  background:linear-gradient(180deg,var(--panel),#111735);
+  border:1px solid var(--hair);border-radius:var(--r-lg);
+  box-shadow:var(--sh),var(--gloss);overflow:hidden;
+}
+#navList button{
+  display:block;width:100%;text-align:left;min-height:46px;padding:13px 16px;
+  background:transparent;color:var(--ink-dim);border:0;border-bottom:1px solid var(--hair);
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;transition:background var(--t),color var(--t);
+}
+#navList button:last-child{border-bottom:0}
+#navList button[aria-selected="true"]{color:var(--magicite);background:rgba(169,140,240,.1)}
 button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);outline-offset:2px;border-radius:var(--r-sm)}
 
 /* ---------- phases + gates ---------- */
@@ -258,7 +268,7 @@ details[open] summary{border-bottom:1px solid var(--hair)}
   .gate-head:hover{background:rgba(255,255,255,.03)}
   .item:hover{background:rgba(255,255,255,.04)}
   .item.auto:hover{background:transparent}
-  nav button:hover{color:var(--ink)}
+  #navList button:hover{background:rgba(255,255,255,.04);color:var(--ink)}
   .tools button:hover{color:var(--ink);border-color:var(--rule)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -268,19 +278,23 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 
 <header>
   <div class="eyebrow">FFVI Pixel Remaster · Perfect Stats + Full Bestiary</div>
-  <div class="titlerow"><h1>Run Tracker</h1><button id="hdrbk" title="Copy a progress backup code">⤓ Backup</button></div>
+  <div class="titlerow"><h1>Run Tracker</h1><span id="hdrTab" class="hdrtab">Route</span><button id="hdrbk" title="Copy a progress backup code">⤓ Backup</button></div>
   <div class="bar"><i id="fill"></i></div>
   <div class="count" id="count">—</div>
 </header>
 
-<nav role="tablist">
-  <button role="tab" data-tab="route" aria-selected="true">Route</button>
-  <button role="tab" data-tab="levels" aria-selected="false">Levels</button>
-  <button role="tab" data-tab="gear" aria-selected="false">Gear</button>
-  <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
-  <button role="tab" data-tab="veldt" aria-selected="false">Veldt & Rages</button>
-  <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
-  <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
+<div id="navBackdrop" hidden></div>
+<nav>
+  <button id="navFab" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="navList" aria-label="Open tab menu">☰</button>
+  <div id="navList" role="tablist" hidden>
+    <button role="tab" data-tab="route" aria-selected="true">Route</button>
+    <button role="tab" data-tab="levels" aria-selected="false">Levels</button>
+    <button role="tab" data-tab="gear" aria-selected="false">Gear</button>
+    <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
+    <button role="tab" data-tab="veldt" aria-selected="false">Veldt & Rages</button>
+    <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
+    <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
+  </div>
 </nav>
 
 <main id="view"></main>
@@ -306,7 +320,7 @@ var TOKEN_KEY = "ff6pr-gist-token";
    this ID is baked into the source, so it survives even when localStorage
    \u2014 including the copy of the ID normally cached there \u2014 is gone. */
 var GIST_ID_BUILTIN = "596d1edfb7763ac049884fc4b5058b2d";
-var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={};
+var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={},tabScroll={};
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
 var LOADFAIL=false;
 if(CANSTORE){var raw=localStorage.getItem(KEY);
@@ -1243,11 +1257,44 @@ document.getElementById("view").innerHTML =
 tab==="route"?routeHTML():tab==="gear"?gearHTML():tab==="coli"?coliHTML():tab==="levels"?levelsHTML():
 tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():notesHTML();
 }
+function closeNavList(){
+document.getElementById("navList").hidden=true;
+document.getElementById("navBackdrop").hidden=true;
+document.getElementById("navBackdrop").classList.remove("show");
+document.getElementById("navFab").setAttribute("aria-expanded","false");
+}
 document.querySelector("nav").addEventListener("click",function(e){
+var trig=e.target.closest("#navFab");
+if(trig){
+var list=document.getElementById("navList");
+var willOpen=list.hidden;
+if(willOpen){
+list.hidden=false;
+var bd=document.getElementById("navBackdrop");
+bd.hidden=false;
+requestAnimationFrame(function(){bd.classList.add("show");});
+}else{
+closeNavList();
+}
+trig.setAttribute("aria-expanded",willOpen);
+return;
+}
 var b=e.target.closest("button[data-tab]");if(!b)return;
+tabScroll[tab]=window.scrollY;
 tab=b.dataset.tab;
-document.querySelectorAll("nav button").forEach(function(x){x.setAttribute("aria-selected",x===b);});
-render();window.scrollTo(0,0);
+document.querySelectorAll("#navList button").forEach(function(x){x.setAttribute("aria-selected",x===b);});
+document.getElementById("hdrTab").textContent=b.textContent;
+closeNavList();
+render();window.scrollTo(0,tabScroll[tab]||0);
+});
+document.getElementById("navBackdrop").addEventListener("click",closeNavList);
+document.addEventListener("click",function(e){
+if(document.getElementById("navList").hidden) return;
+if(e.target.closest("nav")) return;
+closeNavList();
+});
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape"&&!document.getElementById("navList").hidden) closeNavList();
 });
 document.getElementById("view").addEventListener("click",function(e){
 var rg=e.target.closest("[data-rage]");

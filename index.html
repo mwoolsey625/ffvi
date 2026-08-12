@@ -56,15 +56,6 @@ h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
   color:var(--magicite);background:rgba(169,140,240,.12);border:1px solid rgba(169,140,240,.35);
   border-radius:99px;padding:5px 10px;
 }
-#hdrbk{
-  flex:none;padding:10px 14px;min-height:40px;
-  background:linear-gradient(180deg,var(--panel2),#18204A);
-  border:1px solid var(--hair);color:var(--ink);
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-  border-radius:var(--r-md);cursor:pointer;
-  box-shadow:var(--sh),var(--gloss);transition:transform .12s var(--ease),box-shadow var(--t),background var(--t);
-}
-#hdrbk:active{transform:translateY(1px);box-shadow:none;background:var(--panel2)}
 .bar{height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
 .bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--magicite),var(--cyan) 60%,var(--sealed));box-shadow:0 0 12px -2px rgba(169,140,240,.7);transition:width .45s var(--ease)}
 .count{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:8px;letter-spacing:.05em}
@@ -278,7 +269,7 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 
 <header>
   <div class="eyebrow">FFVI Pixel Remaster · Perfect Stats + Full Bestiary</div>
-  <div class="titlerow"><h1>Run Tracker</h1><span id="hdrTab" class="hdrtab">Route</span><button id="hdrbk" title="Copy a progress backup code">⤓ Backup</button></div>
+  <div class="titlerow"><h1>Run Tracker</h1><span id="hdrTab" class="hdrtab">Route</span></div>
   <div class="bar"><i id="fill"></i></div>
   <div class="count" id="count">—</div>
 </header>
@@ -520,7 +511,8 @@ timed:["TIMED","var(--warn)"]};
 var av=AVL[r[7]];
 h+='<span class="gate-title">'+esc(r[0])
 +(av?' <span style="color:'+av[1]+';font-size:9px;letter-spacing:.1em">'+av[0]+'</span>':"")+'</span>';
-h+=full?'<span class="stamp">CLEARED</span>'
+h+=keys.length===0?''
+:full?'<span class="stamp">CLEARED</span>'
 :(stt.s===1?'<span class="stamp" style="border-color:var(--sealed);color:var(--sealed)">NOTHING DUE</span>'
 :'<span class="tally">'+d+"/"+keys.length+'</span>');
 h+='</button>';
@@ -1364,18 +1356,6 @@ if(r){S[r.dataset.role]=r.dataset.val;save();render();}
 
 if(!CANSTORE){note("Preview mode \u2014 ticks work but will not be saved.");}
 if(LOADFAIL){note("Saved data could not be read. It has been kept as a copy \u2014 use Restore.");}
-(function(){
-var b=document.getElementById("hdrbk"); if(!b) return;
-b.addEventListener("click",function(){
-var code=JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open});
-var done=function(t){var c=document.getElementById("count");
-if(c){var old=c.textContent;c.textContent=t;setTimeout(function(){c.textContent=old;},2500);}};
-if(navigator.clipboard&&navigator.clipboard.writeText){
-navigator.clipboard.writeText(code).then(function(){done("Backup copied to clipboard");},
-function(){tab="notes";render();done("Open Notes and copy the code");});
-}else{tab="notes";render();done("Open Notes and copy the code");}
-});
-})();
 render();
 function syncFromCloud(manual){
 if(manual)note("Checking cloud backup…");

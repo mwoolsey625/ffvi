@@ -522,6 +522,14 @@ if(r[2]) h+='<div class="seal-line">Last chance before: <b>'+esc(r[2])+'</b></di
 if(r[7]==="wob") h+='<div class="seal-line">Not available in the <b>World of Ruin</b></div>';
 if(r[7]==="once") h+='<div class="seal-line">Single visit \u2014 <b>no way back</b></div>';
 if(r[7]==="timed") h+='<div class="seal-line"><b>Timer running</b> once you enter</div>';
+if(r[11]&&r[11].length){
+var sksteps="r"+ri+"steps";
+h+=sect("Steps",null,null,"var(--cyan)",null,sksteps,true);
+if(open[sksteps]){
+h+='<ol style="margin:2px 0 6px;padding-left:19px;font-size:13px;color:var(--ink);line-height:1.6">';
+r[11].forEach(function(t){h+='<li style="margin-bottom:6px">'+esc(t)+'</li>';});
+h+='</ol>';}
+}
 if(r[10]&&r[10].length){
 var skp="r"+ri+"p";
 h+=sect("Party",r[10].length,null,"var(--sealed)",null,skp,false);
@@ -824,7 +832,7 @@ var h='<div class="card"><h3>How new party members get their level</h3>'
 +'<p class="p">These help the whole party, or cover a job nobody else can. One copy each is enough unless noted.</p>'
 +'<p class="p"><b>Sprint Shoes</b> \u2014 any one character. Doubles walking speed for everyone. Buy in South Figaro (1,500 g).</p>'
 +'<p class="p"><b>Hermes Sandals</b> \u2014 permanent Haste. Different item from Sprint Shoes. Tzen or Narshe post-IMRF (7,000 g).</p>'
-+'<p class="p"><b>Thief\'s Bracer</b> \u2014 <b>Locke</b>. Raises steal rate; you need it for Kazekiri off Number 128. Tzen in the World of Ruin (3,000 g).</p>'
++'<p class="p"><b>Thief\'s Bracer</b> \u2014 <b>Locke</b>. Raises steal rate. Doubles nothing for the Kazekiri steal off Number 128 in the Magitek Factory \u2014 that chest and the Tzen shop both open only afterward, so that steal is base-rate. Free from a Narshe treasure-house chest right after the Magitek Factory, or buy it in Tzen in the World of Ruin (3,000 g).</p>'
 +'<p class="p"><b>Molulu\'s Charm</b> \u2014 <b>Mog only</b>. Blocks random encounters. Hidden behind where Mog stood, Narshe mines WoR.</p>'
 +'<p class="p"><b>Growth Egg</b> \u2014 doubles EXP. Park it on whoever you are levelling in Phase II. Darill\'s Tomb, hidden path east of the Regal Gown.</p>'
 +'<p class="p"><b>Gale Hairpin</b> \u2014 more preemptive strikes, which speeds up bestiary sweeps. Nikeah WoR (8,000 g).</p>'
@@ -864,7 +872,7 @@ function ragesBodyHTML(){
 var h='<div class="card"><h3 style="color:var(--sealed)">Order of operations</h3>'
 +'<p class="p">Every formation you defeat is added to the Veldt pool, and a fuller pool means longer hunts for the Rage you actually want. So the order matters more than the totals.</p>'
 +'<p class="p"><b>1.</b> In areas that close, take everything \u2014 you get no second chance.<br>'
-+'<b>2.</b> Bank the eight Rages below.<br>'
++'<b>2.</b> Bank the nine Rages below.<br>'
 +'<b>3.</b> Only then sweep the permanent areas for bestiary entries.</p>'
 +'<p class="p">Route stops marked <b style="color:var(--sealed)">SAFE TO DEFER</b> are step 3. Ones marked <b style="color:var(--warn)">GET NOW</b> are step 1.</p></div>'
 +'<div class="card"><h3>Front-load these</h3><p class="p">A full bestiary means fighting nearly every formation, which crowds the Veldt. Get the combat-critical Rages before that happens — everything else is opportunistic.</p>'
@@ -1075,14 +1083,14 @@ return ''
 +'<h4>What this reconciles</h4>'
 +'<p>Two guides that were never written to work together. <b>Simmeh\'s Low Level/Perfect Stats Walkthrough</b> (Steam) gives boss strategy and level discipline but explicitly disclaims bestiary coverage. <b>bover_87\'s Missable Item Walkthrough</b> (GameFAQs) gives the cutoffs but knows nothing about level-locking. Where one says skip and the other says kill, the Gates tab already resolves it.</p>'
 +'<h4>The core reframe</h4>'
-+'<p>Simmeh keeps encounters <b>off</b> all game to limit Veldt entropy so Gau\'s Rages stay findable. A full bestiary wants the opposite. Accept the congested Veldt — it is the price of the run. Mitigate by front-loading the eight Rages on the Veldt & Rages tab.</p>'
++'<p>Simmeh keeps encounters <b>off</b> all game to limit Veldt entropy so Gau\'s Rages stay findable. A full bestiary wants the opposite. Accept the congested Veldt — it is the price of the run. Mitigate by front-loading the nine Rages on the Veldt & Rages tab.</p>'
 +'<p>With EXP at 0x, extra combat is <b>free</b>. Nothing about fighting more threatens the stat plan during Phase I. The threat is dying at level 5.</p>'
 +'<h4>Phase I survival pattern</h4>'
 +'<p>Gobbledygook Rage to Vanish the party, or the Phantom esper once you have it. An Invisible party is immune to physicals, which trivialises most low-level grinding. Simmeh uses this only for Number 024 and the Esper Cave — use it far more broadly.</p>'
 +'<h4>The three traps that matter most</h4>'
 +'<ul>'
 +'<li><b>Cave to the Sealed Gate.</b> Simmeh says to waltz through with encounters off because there are no Rages worth having. That cave hard-locks five entries plus the Ultima Weapon, Heiji\'s Jitte and Kazekiri #2 when you board at Albrook.</li>'
-+'<li><b>Air Force.</b> His PSG strategy is two Thundaras on the main body, which ends the fight before Bit ever spawns. Bit never appears again.</li>'
++'<li><b>Air Force.</b> His PSG strategy is two Thundaras on the main body, which ends the fight before Bit ever spawns. Bit never appears again. Trigger CONFIRMED for PR: kill the Laser Gun and ONLY the Laser Gun — two independent current PR sources agree, none support a kill-all-adds alternative.</li>'
 +'<li><b>Naude.</b> Must be killed, not merely forced to flee. Imp is the standard clear and it makes them run, registering nothing. Six-minute timer, and Celes is force-joined — so level her before ascending past Ultima Weapon.</li>'
 +'</ul>'
 +'<h4>Best synergy</h4>'
@@ -1095,7 +1103,6 @@ return ''
 +'<p><b>Treat every Soul Shrine fallback as nonexistent.</b> Magna Roader (red) and Rafflesia are the two most often waved off as recoverable. In PR they are not.</p>'
 +'<h4 class="flag">Still unverified</h4>'
 +'<ul>'
-+'<li><b>Bit trigger.</b> bover_87 says kill all adds; RPG Site says PR specifically requires the Laser Gun and only the Laser Gun. Quicksave and test.</li>'
 +'<li><b>Reload behaviour.</b> The +13 group jump is SNES/PS. Later versions randomise instead. Confirm which applies before leaning on Veldt manipulation.</li>'
 +'</ul>'
 +'</div></details>'

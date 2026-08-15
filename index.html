@@ -522,14 +522,6 @@ if(r[2]) h+='<div class="seal-line">Last chance before: <b>'+esc(r[2])+'</b></di
 if(r[7]==="wob") h+='<div class="seal-line">Not available in the <b>World of Ruin</b></div>';
 if(r[7]==="once") h+='<div class="seal-line">Single visit \u2014 <b>no way back</b></div>';
 if(r[7]==="timed") h+='<div class="seal-line"><b>Timer running</b> once you enter</div>';
-if(r[11]&&r[11].length){
-var sksteps="r"+ri+"steps";
-h+=sect("Steps",null,null,"var(--cyan)",null,sksteps,true);
-if(open[sksteps]){
-h+='<ol style="margin:2px 0 6px;padding-left:19px;font-size:13px;color:var(--ink);line-height:1.6">';
-r[11].forEach(function(t){h+='<li style="margin-bottom:6px">'+esc(t)+'</li>';});
-h+='</ol>';}
-}
 if(r[10]&&r[10].length){
 var skp="r"+ri+"p";
 h+=sect("Party",r[10].length,null,"var(--sealed)",null,skp,false);
@@ -540,11 +532,11 @@ h+='</ul>';}
 }
 if(r[3].length){
 var sk="r"+ri+"t";
-h+=sect("To do",r[3].length,null,"var(--magicite)",null,sk,true);
+h+=sect("Walkthrough",r[3].length,null,"var(--magicite)",null,sk,true);
 if(open[sk]){
-h+='<ul style="margin:2px 0 6px;padding-left:17px;font-size:13px;color:var(--ink);line-height:1.6">';
+h+='<ol style="margin:2px 0 6px;padding-left:19px;font-size:13px;color:var(--ink);line-height:1.6">';
 r[3].forEach(function(t){h+='<li style="margin-bottom:6px">'+esc(t)+'</li>';});
-h+='</ul>';}
+h+='</ol>';}
 }
 if(r[8]&&r[8].length){
 var sks="r"+ri+"s";

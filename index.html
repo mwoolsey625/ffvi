@@ -311,11 +311,43 @@ var TOKEN_KEY = "ff6pr-gist-token";
    this ID is baked into the source, so it survives even when localStorage
    \u2014 including the copy of the ID normally cached there \u2014 is gone. */
 var GIST_ID_BUILTIN = "596d1edfb7763ac049884fc4b5058b2d";
+/* Treasure checkboxes key on the AREA NAME (see tkey), so renaming an area orphans
+   every tick under it. These eight areas were renamed to their real Pixel Remaster
+   names — "Sabin's house" is Duncan's cabin, Gogo is inside Zone Eater rather than
+   on Triangle Island, and so on. Remap old keys to new on the way in.
+   Idempotent: no NEW name is itself a key of the map, so re-running is a no-op. */
+var AREA_RENAMES={
+"Sabin's house":"Duncan's Cabin",
+"House at Dragon's Neck":"Dragon's Neck Cabin",
+"Magitek Factory":"Magitek Research Facility — floors 1 and 2",
+"Magitek Research Facility":"Magitek Research Facility — later floor",
+"Esper Caves":"Esper Cave",
+"Jidoor, Owzer's house":"Owzer's Mansion",
+"Narshe, Umaro's cave":"Yeti's Cave",
+"Triangle Island, Gogo's lair":"Zone Eater's Belly"};
+function migrateChecked(c){
+if(!c)return {};
+var out={},moved=0;
+for(var k in c){ if(!Object.prototype.hasOwnProperty.call(c,k)){continue;}
+var nk=k;
+if(k.indexOf("t:")===0){
+var cut=k.lastIndexOf(":");            /* index is always the last segment */
+if(cut>1){
+var area=k.slice(2,cut);
+if(Object.prototype.hasOwnProperty.call(AREA_RENAMES,area)){
+nk="t:"+AREA_RENAMES[area]+k.slice(cut); moved++; }
+}
+}
+if(out[nk]===undefined) out[nk]=c[k];
+}
+if(moved) try{console.log("tracker: remapped "+moved+" treasure keys to renamed areas");}catch(e){}
+return out;
+}
 var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={},tabScroll={};
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
 var LOADFAIL=false;
 if(CANSTORE){var raw=localStorage.getItem(KEY);
-if(raw){try{var p=JSON.parse(raw);S.checked=p.checked||{};S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};S.updated=p.updated||0;if(p.open)open=p.open;}
+if(raw){try{var p=JSON.parse(raw);S.checked=migrateChecked(p.checked||{});S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};S.updated=p.updated||0;if(p.open)open=p.open;}
 catch(e){LOADFAIL=true;try{localStorage.setItem(KEY+"-damaged",raw);}catch(e2){}}}}
 function note(t){
 var c=document.getElementById("count");if(!c)return;
@@ -1327,7 +1359,7 @@ function(){say("Select the text above and copy it.");});}
 else say("Select the text above and copy it.");
 return;}
 if(a.dataset.act==="import"){
-try{var q=JSON.parse(io.value);S.checked=q.checked||{};S.terra=q.terra||"Magic";
+try{var q=JSON.parse(io.value);S.checked=migrateChecked(q.checked||{});S.terra=q.terra||"Magic";
 S.celes=q.celes||"Strength";S.assign=q.assign||{};if(q.open)open=q.open;
 S.updated=Date.now();save();render();
 document.getElementById("msg2").textContent="Progress restored.";}
@@ -1378,7 +1410,7 @@ if(remote){
 CLOUD.pull={status:"ok",err:"",at:Date.now()};
 var remoteUpdated=remote.updated||0;
 if(remoteUpdated>(S.updated||0)){
-S.checked=remote.checked||{};S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
+S.checked=migrateChecked(remote.checked||{});S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
 S.assign=remote.assign||{};S.updated=remoteUpdated;
 save();render();
 note("Pulled newer progress from cloud.");

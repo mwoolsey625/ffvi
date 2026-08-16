@@ -1,0 +1,3 @@
+# Preview-server config. Points at a session-specific temp path that is gone by the
+# next session, so a committed copy would be broken config rather than useful config.
+.claude/launch.json

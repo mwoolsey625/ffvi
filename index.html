@@ -403,7 +403,7 @@ var PHNOTE={1:"Average level 5\u20136. Much of this becomes unreachable once you
 4:"Cyan's Dream is the largest single loss still available."};
 var MISSABLE={};
 /* Bestiary numbers whose Rage you want before the Veldt fills up. */
-var RAGEWANT={278:1,18:1,40:1,44:1,51:1,50:1,64:1,32:1,97:1};
+var RAGEWANT={265:1,18:1,40:1,44:1,51:1,50:1,64:1,32:1,97:1};
 (function(){
 PHASES.forEach(function(p){p.gates.forEach(function(g){
 g.items.forEach(function(it){var n=itemNum(it); if(n) MISSABLE[n]=1;});
@@ -412,7 +412,7 @@ g.items.forEach(function(it){var n=itemNum(it); if(n) MISSABLE[n]=1;});
 /* Mandatory story bosses need no manual tick — you fight them whether you like it
    or not. The exceptions are anything still flagged missable/rare (Hell's Rider)
    or wanted early for its Rage (Guard Leader) — those stay real checkboxes. */
-function isMandatoryBoss(x){return x[0]>=276 && !MISSABLE[x[0]] && !RAGEWANT[x[0]];}
+function isMandatoryBoss(x){return x[0]>=263 && !MISSABLE[x[0]] && !RAGEWANT[x[0]];}
 /* Does a LATER route stop (or the Act 1 Cleanup section) track this same bestiary
    number again? If so an earlier "closes soon" stop doesn't need to panic about it. */
 function laterEnemyOccurrence(num,afterRi){
@@ -429,7 +429,7 @@ return false;
    urgency when nothing later re-tracks the same entry. Rage-wanted/boss status
    is always urgent regardless of what comes after. */
 function enemyUrgent(x,r,ri){
-if(x[0]>=276||RAGEWANT[x[0]]) return true;
+if(x[0]>=263||RAGEWANT[x[0]]) return true;
 if(!MISSABLE[x[0]]&&!r[7]) return false;
 return !laterEnemyOccurrence(x[0],ri);
 }
@@ -561,13 +561,13 @@ if(id==="g15"){
 var regNums=[],bossNums=[];
 BEST.forEach(function(gr){gr.e.forEach(function(x){
 if(x[0]>=1&&x[0]<=112) regNums.push(x[0]);
-else if(x[0]>=276) bossNums.push(x[0]);
+else if(x[0]>=263) bossNums.push(x[0]);
 });});
 var regDone=regNums.filter(function(n){return !!S.checked["b:"+n];}).length;
 var bossDone=bossNums.filter(function(n){return isMandatoryBoss([n])||!!S.checked["b:"+n];}).length;
 autoRows=[
 ["Bestiary entries #1\u2013112 registered",regDone,regNums.length],
-["Boss entries #276\u2013287 registered \u2014 mandatory ones count themselves; only Guard Leader and Hell's Rider still need a manual tick",bossDone,bossNums.length]
+["Boss entries #263\u2013274 registered \u2014 mandatory ones count themselves; only Guard Leader and Hell's Rider still need a manual tick",bossDone,bossNums.length]
 ];
 }
 if(!solo.length && !autoRows.length) return;

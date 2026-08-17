@@ -255,6 +255,60 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 }
 .msg{font-family:var(--mono);font-size:11px;color:var(--sealed);margin-top:10px;min-height:15px}
 
+/* ---------- notes: long-press anything to flag it ---------- */
+/* The long press has to beat the OS text-selection gesture, or iOS raises its own
+   callout menu on top of the sheet. Selection is not something this app needs;
+   the note textarea opts back in below. */
+#view{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+/* Ramps over the press so the gesture is visible while it is happening, rather
+   than firing out of nowhere. */
+.lp{background:rgba(245,182,94,.2)!important;transition:background .5s linear}
+.hasnote::after{
+  content:"\270E";flex:none;align-self:flex-start;
+  margin-left:6px;color:var(--warn);font-size:12px;line-height:1.3;
+}
+.hasnote.note-done::after{color:var(--ink-dim);opacity:.55}
+tr.hasnote::after{content:none}
+tr.hasnote>td:first-child::after{content:"\270E";color:var(--warn);margin-left:5px;font-size:12px}
+tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
+
+#noteSheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+#noteSheet[hidden]{display:none}
+#noteBackdrop{position:absolute;inset:0;background:rgba(4,7,20,.62)}
+#noteBox{
+  position:relative;width:min(560px,100%);
+  padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,var(--panel),#111735);
+  border:1px solid var(--hair);border-radius:var(--r-lg) var(--r-lg) 0 0;
+  box-shadow:var(--sh-lift),var(--gloss);
+  transform:translateY(16px);opacity:0;transition:transform var(--t),opacity var(--t);
+}
+#noteSheet.show #noteBox{transform:none;opacity:1}
+#noteCtx{
+  font-size:11.5px;color:var(--ink-dim);line-height:1.5;
+  border-left:3px solid var(--magicite);padding:5px 0 5px 10px;margin-bottom:12px;
+  max-height:78px;overflow:auto;
+}
+#noteText{
+  width:100%;background:var(--field);color:var(--ink);
+  border:1px solid var(--rule-dim);border-radius:var(--r-md);padding:11px;
+  font-family:var(--sans);font-size:16px;line-height:1.5;min-height:96px;
+  -webkit-user-select:text;user-select:text;
+}
+#noteBtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#noteBtns .seg{flex:1 1 auto;text-align:center}
+#noteBtns .seg[data-note="save"]{color:var(--ink);border-color:rgba(79,211,166,.55);background:rgba(79,211,166,.12)}
+#noteBtns .seg[data-note="del"]{color:var(--warn)}
+
+.note-row{border-top:1px solid var(--hair);padding:13px 0}
+.note-row.done .note-body{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}
+.note-body{font-size:14px;line-height:1.5;white-space:pre-wrap}
+.note-ctx{font-size:11.5px;color:var(--ink-dim);line-height:1.45;margin-top:6px;
+  border-left:2px solid var(--rule-dim);padding-left:9px}
+.note-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--rule);margin-top:8px}
+.note-acts{display:flex;gap:7px;margin-top:10px}
+.note-acts .seg{padding:7px 12px;min-height:34px;font-size:10px}
+
 @media (hover:hover){
   .gate-head:hover{background:rgba(255,255,255,.03)}
   .item:hover{background:rgba(255,255,255,.04)}
@@ -279,6 +333,7 @@ details[open] summary{border-bottom:1px solid var(--hair)}
   <button id="navFab" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="navList" aria-label="Open tab menu">☰</button>
   <div id="navList" role="tablist" hidden>
     <button role="tab" data-tab="route" aria-selected="true">Route</button>
+    <button role="tab" data-tab="mynotes" aria-selected="false">My Notes</button>
     <button role="tab" data-tab="levels" aria-selected="false">Levels</button>
     <button role="tab" data-tab="gear" aria-selected="false">Gear</button>
     <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
@@ -289,6 +344,20 @@ details[open] summary{border-bottom:1px solid var(--hair)}
 </nav>
 
 <main id="view"></main>
+
+<div id="noteSheet" hidden>
+  <div id="noteBackdrop"></div>
+  <div id="noteBox" role="dialog" aria-modal="true" aria-label="Note">
+    <div id="noteCtx"></div>
+    <textarea id="noteText" spellcheck="true" placeholder="What is wrong here?"></textarea>
+    <div id="noteBtns">
+      <button class="seg" type="button" data-note="save">Save</button>
+      <button class="seg" type="button" id="noteDone" data-note="done">Resolve</button>
+      <button class="seg" type="button" id="noteDel" data-note="del">Delete</button>
+      <button class="seg" type="button" data-note="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
@@ -343,11 +412,30 @@ if(out[nk]===undefined) out[nk]=c[k];
 if(moved) try{console.log("tracker: remapped "+moved+" treasure keys to renamed areas");}catch(e){}
 return out;
 }
-var S={checked:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={},tabScroll={};
+/* Notes anchored to a checklist row carry that row's key verbatim ("k:t:Area:3"),
+   so an area rename orphans the note exactly the way it orphans the tick. Run the
+   same rename map over them. Text-anchored notes ("h:...") are unaffected. */
+function migrateNotes(n){
+if(!n)return {};
+var out={};
+for(var k in n){ if(!Object.prototype.hasOwnProperty.call(n,k)){continue;}
+var nk=k;
+if(k.indexOf("k:t:")===0){
+var body=k.slice(2),cut=body.lastIndexOf(":");
+if(cut>1){
+var area=body.slice(2,cut);
+if(Object.prototype.hasOwnProperty.call(AREA_RENAMES,area))nk="k:t:"+AREA_RENAMES[area]+body.slice(cut);
+}
+}
+if(out[nk]===undefined)out[nk]=n[k];
+}
+return out;
+}
+var S={checked:{},notes:{},terra:"Magic",celes:"Strength",assign:{},updated:0},tab="route",open={},tabScroll={};
 var CANSTORE=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}catch(e){return false;}})();
 var LOADFAIL=false;
 if(CANSTORE){var raw=localStorage.getItem(KEY);
-if(raw){try{var p=JSON.parse(raw);S.checked=migrateChecked(p.checked||{});S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};S.updated=p.updated||0;if(p.open)open=p.open;}
+if(raw){try{var p=JSON.parse(raw);S.checked=migrateChecked(p.checked||{});S.notes=migrateNotes(p.notes||{});S.terra=p.terra||"Magic";S.celes=p.celes||"Strength";S.assign=p.assign||{};S.updated=p.updated||0;if(p.open)open=p.open;}
 catch(e){LOADFAIL=true;try{localStorage.setItem(KEY+"-damaged",raw);}catch(e2){}}}}
 function note(t){
 var c=document.getElementById("count");if(!c)return;
@@ -358,7 +446,7 @@ note._t=setTimeout(function(){renderHead();},4000);
 function save(){if(!CANSTORE||LOADFAIL)return;
 S.updated=Date.now();
 try{var prev=localStorage.getItem(KEY);if(prev)localStorage.setItem(KEY+"-prev",prev);
-localStorage.setItem(KEY,JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated}));}
+localStorage.setItem(KEY,JSON.stringify({checked:S.checked,notes:S.notes,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated}));}
 catch(e){note("Storage unavailable \u2014 use Back up progress.");}
 scheduleCloudPush();}
 
@@ -372,7 +460,7 @@ var pushTimer=null;
 function getToken(){try{return (CANSTORE&&localStorage.getItem(TOKEN_KEY))||"";}catch(e){return "";}}
 function setToken(t){try{if(!CANSTORE)return;if(t)localStorage.setItem(TOKEN_KEY,t);else localStorage.removeItem(TOKEN_KEY);}catch(e){}}
 function gistId(){if(GIST_ID_BUILTIN)return GIST_ID_BUILTIN;try{return (CANSTORE&&localStorage.getItem(GIST_KEY))||"";}catch(e){return "";}}
-function statePayload(){return JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,updated:S.updated});}
+function statePayload(){return JSON.stringify({checked:S.checked,notes:S.notes,terra:S.terra,celes:S.celes,assign:S.assign,updated:S.updated});}
 function renderCloudStatus(){if(tab==="settings")render();}
 function scheduleCloudPush(){
 if(!getToken())return;
@@ -425,8 +513,11 @@ function progress(){var k=allKeys(),d=0;k.forEach(function(x){if(S.checked[x])d+
 function renderHead(){
 var p=progress(),pct=p.t?Math.round(p.d/p.t*100):0;
 document.getElementById("fill").style.width=pct+"%";
-document.getElementById("count").textContent=p.d+" / "+p.t+" tracked · "+pct+"%";
+var op=openNoteCount();
+document.getElementById("count").textContent=p.d+" / "+p.t+" tracked · "+pct+"%"
++(op?" · ✎ "+op+" open":"");
 }
+function openNoteCount(){var c=0;for(var k in S.notes){if(S.notes[k]&&!S.notes[k].d)c++;}return c;}
 var PHNAME={1:"Phase I \u2014 Levels Held (EXP 0x)",2:"Phase II \u2014 The Split",
 3:"Phase III \u2014 Unlocked",4:"World of Ruin"};
 var PHNOTE={1:"Average level 5\u20136. Much of this becomes unreachable once you move on.",
@@ -576,7 +667,7 @@ h+=sect("Shop",r[8].length,null,"var(--cyan)",null,sks,false);
 if(open[sks]){
 h+='<div class="sect-note">What is worth the gil here \u2014 not the whole inventory.</div>';
 r[8].forEach(function(b){
-h+='<div style="display:flex;gap:9px;padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px">'
+h+='<div style="display:flex;gap:9px;padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px" class="rowline">'
 +'<span style="flex:1"><b>'+esc(b[0])+'</b>'
 +(b[3]?' <span style="color:var(--magicite);font-size:9px;letter-spacing:.1em">PRE-BUY \u00b7 '+esc(b[3].toUpperCase())+'</span>':"")
 +(b[2]?'<span class="sub">'+esc(b[2])+(b[3]?' \u2014 '+esc(b[3])+' has not joined yet':"")+'</span>':"")+'</span>'
@@ -742,11 +833,11 @@ h+='<div class="seal-line">Bet <b>'+esc(f.bet)+'</b> to fight <b>'+esc(f.vs)+'</
 h+='<div class="seal-line">Send: <b style="color:var(--sealed)">'+esc(f.who)+'</b></div>';
 h+='<div class="sect" style="border-left-color:var(--cyan);color:var(--cyan);margin-top:14px"><span>Where the bet item comes from</span></div>';
 (f.src||[]).forEach(function(row){
-h+='<div style="padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px">'
+h+='<div style="padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px" class="rowline">'
 +'<b style="color:var(--cyan)">'+esc(row[0])+'</b><span class="sub">'+esc(row[1])+'</span></div>';});
 h+='<div class="sect" style="border-left-color:var(--sealed);color:var(--sealed);margin-top:14px"><span>Loadout</span></div>';
 f.kit.forEach(function(row){
-h+='<div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--rule-dim);font-size:13px">'
+h+='<div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--rule-dim);font-size:13px" class="rowline">'
 +'<span style="width:56px;flex:none;color:var(--ink-dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding-top:2px">'+esc(row[0])+'</span>'
 +'<span style="flex:1">'+esc(row[1])+'</span></div>';});
 h+='<div style="font-size:13px;line-height:1.6;padding:10px 0 6px">'+esc(f.s)+'</div>';
@@ -764,7 +855,7 @@ h+='<span class="tally">'+c.steps.length+' steps</span></button>';
 if(isOpen){
 h+='<div class="gbody">';
 c.steps.forEach(function(st,j){
-h+='<div style="display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--rule-dim);font-size:13px">'
+h+='<div style="display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--rule-dim);font-size:13px" class="rowline">'
 +'<span style="color:var(--cyan);width:16px;flex:none">'+(j+1)+'</span><span>'+esc(st)+'</span></div>';});
 h+='<div class="sect-note" style="margin-top:8px">'+esc(c.note)+'</div></div>';}
 h+='</div>';});
@@ -827,7 +918,7 @@ h+='<div class="gbody">';
 e.s.forEach(function(row){
 var held=row[2]&&holder(row[2])===e.c;
 var txt=row[2]?(held?row[1]:row[3]):row[1];
-h+='<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px">'
+h+='<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--rule-dim);font-size:13px" class="rowline">'
 +'<span style="width:60px;flex:none;color:var(--ink-dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding-top:2px">'+esc(row[0])+'</span>'
 +'<span style="flex:1">'+esc(txt)
 +(held?' <span style="color:var(--magicite);font-size:9px;letter-spacing:.1em">ASSIGNED</span>':"")+'</span></div>';});
@@ -1290,12 +1381,161 @@ h+='<div class="card"><h3 class="flag" style="color:var(--warn)">Provenance — 
 +'<p class="p">After linking duplicates this gives <b>265 unique containers</b>; PR counts <b>214 chests + 50 hidden items = 264</b>. The totals agree to within one. The split does not — PR classifies roughly ten things as chests that Corundum calls pots or barrels. So trust the <i>total</i> and the <i>locations</i> here, and the in-game per-zone counter for the chest-versus-hidden split.</p></div>';
 return h;
 }
+/* ================= notes: anchoring ==================================
+   A note has to still point at the right line after the data files are edited,
+   and route.js/treasure.js get edited constantly. So anchors are never array
+   positions:
+
+     - Anything that already carries a data-key reuses it verbatim. That key
+       space is content-derived ("t:<area name>:<i>", "b:<bestiary no>") and is
+       already covered by the rename migration, so notes inherit that for free.
+     - Everything else is keyed by a hash of its own visible text plus the stop
+       it sits in. Inserting a step, reordering stops or renumbering areas moves
+       nothing. Rewording the line itself does detach the note - which is why
+       every note also stores a copy of the text it was written against, and the
+       My Notes tab reads from that copy rather than from the page. A detached
+       note goes stale; it never goes missing.
+
+   Counts and tick marks are stripped before hashing, or ticking a box would
+   silently re-key every note in the gate. */
+/* Deliberately no ".gate-title": it lives inside .gate-head, and having both
+   match would make the press target depend on where in the header you pressed. */
+var NOTE_SEL=".item,.gate-head,.sect,li,tr,.warn,.seal-line,.sect-note,.rowline,.p,h3,h4,.phase-name";
+var NOTE_STRIP=".box,.tally,.stamp,.chev,.sect-chev,.sect-n,.sect-tag";
+function noteHash(s){
+var a=2166136261,b=5381;
+for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);
+a=(((a^c)>>>0)*16777619)>>>0;
+b=(((b<<5)+b+c)|0)>>>0;}
+return a.toString(36)+"-"+b.toString(36);
+}
+function noteText(el){
+var c=el.cloneNode(true),i,x=c.querySelectorAll(NOTE_STRIP);
+for(i=0;i<x.length;i++){if(x[i].parentNode)x[i].parentNode.removeChild(x[i]);}
+return (c.textContent||"").replace(/\s+/g," ").trim();
+}
+function noteKeyFor(el){
+if(el.dataset.key)return "k:"+el.dataset.key;
+var t=noteText(el);
+if(!t)return "";
+var g=el.closest?el.closest(".gate"):null;
+var head=g?g.querySelector(".gate-title"):null;
+/* Scope by the stop title so two stops sharing a step wording stay distinct. */
+var scope=(head&&head!==el)?noteText(head):"";
+return "h:"+noteHash(tab+"|"+scope+"|"+t.slice(0,300));
+}
+function stampNotes(){
+var root=document.getElementById("view");
+if(!root)return;
+/* The My Notes tab is the management screen - flagging a note about a note is
+   noise, so it is the one place the gesture is off. */
+if(tab==="mynotes")return;
+var els=root.querySelectorAll(NOTE_SEL),seen={},i;
+for(i=0;i<els.length;i++){
+var el=els[i],k=noteKeyFor(el);
+if(!k)continue;
+seen[k]=(seen[k]||0)+1;
+/* Identical wording twice in one stop: the first keeps the bare key, so
+   deleting a later duplicate cannot move an existing note. */
+if(seen[k]>1)k+="#"+seen[k];
+el.dataset.nk=k;
+var n=S.notes[k];
+if(n){el.classList.add("hasnote");if(n.d)el.classList.add("note-done");}
+}
+}
+
+/* ================= notes: the long press ============================= */
+var LP={t:null,el:null,x:0,y:0,fired:false};
+function lpCancel(){
+if(LP.t){clearTimeout(LP.t);LP.t=null;}
+if(LP.el)LP.el.classList.remove("lp");
+LP.el=null;
+}
+function lpFire(el){
+lpCancel();
+LP.fired=true;
+try{if(navigator.vibrate)navigator.vibrate(18);}catch(e){}
+openNote(el.dataset.nk,noteText(el));
+}
+var TABNAME={route:"Route",levels:"Levels",gear:"Gear",coli:"Coliseum",
+veldt:"Veldt & Rages",notes:"Route merge",settings:"Settings",mynotes:"My Notes"};
+function noteWhen(t){
+if(!t)return "";
+var d=new Date(t);
+return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "
++d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+}
+function notesAsText(){
+var ks=noteOrder();
+if(!ks.length)return "No notes.";
+var out=[];
+ks.forEach(function(k){var n=S.notes[k];
+out.push((n.d?"[done] ":"[open] ")+(TABNAME[n.w]||n.w||"?")+" — "+noteWhen(n.ts)
++"\n  note: "+n.t
++"\n  on:   "+(n.c||"(no context)"));});
+return out.join("\n\n");
+}
+function noteOrder(){
+var ks=Object.keys(S.notes||{}).filter(function(k){return !!S.notes[k];});
+/* Open before resolved, newest first inside each - the thing you just flagged
+   in bed should be at the top when you sit down at the machine. */
+ks.sort(function(a,b){
+var x=S.notes[a],y=S.notes[b];
+if((x.d?1:0)!==(y.d?1:0))return (x.d?1:0)-(y.d?1:0);
+return (y.m||y.ts||0)-(x.m||x.ts||0);
+});
+return ks;
+}
+function myNotesHTML(){
+var ks=noteOrder();
+var op=ks.filter(function(k){return !S.notes[k].d;}).length;
+var h='<div class="card"><h3>How this works</h3>'
++'<p class="p"><b>Press and hold</b> any line anywhere in the app for half a second — a walkthrough step, a checklist row, a section header, a table row — and a box opens where you can type. The line then carries a <b style="color:var(--warn)">✎</b> so you can see at a glance that you flagged it.</p>'
++'<p class="p">Nothing you write is ever thrown away. Each note keeps a copy of the text it was attached to, so even if that line is later edited or removed, the note still shows what it was about.</p></div>';
+
+if(!ks.length){
+return h+'<div class="card"><h3>Nothing flagged yet</h3>'
++'<p class="p">Long-press anything that looks wrong while you play. Come back here to read them all in one place.</p></div>';
+}
+
+h+='<div class="card"><h3>'+op+' open · '+(ks.length-op)+' resolved</h3>'
++'<div style="display:flex;gap:8px;flex-wrap:wrap">'
++'<button class="seg" type="button" data-mn="copy">Copy all as text</button>'
++(ks.length-op?'<button class="seg" type="button" data-mn="purge">Delete resolved</button>':"")
++'</div>'
++'<div class="p" id="msgNotes" style="color:var(--sealed);min-height:16px;margin-top:10px"></div>'
++'<textarea id="notesOut" spellcheck="false" style="display:none;width:100%;margin-top:4px;'
++'background:var(--field);color:var(--ink);border:1px solid var(--rule-dim);border-radius:var(--r-md);'
++'padding:9px;font-family:var(--mono);font-size:11px;min-height:120px;-webkit-user-select:text;user-select:text"></textarea>'
++'</div>';
+
+var lastDone=null;
+ks.forEach(function(k){
+var n=S.notes[k],isDone=!!n.d;
+if(isDone!==lastDone){
+lastDone=isDone;
+h+='<div class="sect" style="border-left-color:'+(isDone?"var(--sealed)":"var(--warn)")+';color:'+(isDone?"var(--sealed)":"var(--warn)")+'"><span>'+(isDone?"Resolved":"Open")+'</span></div>';
+}
+h+='<div class="note-row'+(isDone?" done":"")+'">'
++'<div class="note-body">'+esc(n.t)+'</div>'
++(n.c?'<div class="note-ctx">'+esc(n.c)+'</div>':"")
++'<div class="note-meta">'+esc(TABNAME[n.w]||n.w||"—")+' · '+esc(noteWhen(n.ts))+'</div>'
++'<div class="note-acts">'
++'<button class="seg" type="button" data-mn="edit" data-mk="'+esc(k)+'">Edit</button>'
++'<button class="seg" type="button" data-mn="done" data-mk="'+esc(k)+'">'+(isDone?"Reopen":"Resolve")+'</button>'
++'<button class="seg" type="button" data-mn="del" data-mk="'+esc(k)+'" style="color:var(--warn)">Delete</button>'
++'</div></div>';
+});
+return h;
+}
 function render(){
 renderHead();
 document.getElementById("view").innerHTML =
 tab==="route"?routeHTML():tab==="gear"?gearHTML():tab==="coli"?coliHTML():tab==="levels"?levelsHTML():
-tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():notesHTML();
+tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():tab==="mynotes"?myNotesHTML():notesHTML();
+stampNotes();
 }
+function rerender(){var y=window.scrollY;render();window.scrollTo(0,y);}
 function closeNavList(){
 document.getElementById("navList").hidden=true;
 document.getElementById("navBackdrop").hidden=true;
@@ -1336,6 +1576,28 @@ document.addEventListener("keydown",function(e){
 if(e.key==="Escape"&&!document.getElementById("navList").hidden) closeNavList();
 });
 document.getElementById("view").addEventListener("click",function(e){
+var mn=e.target.closest("[data-mn]");
+if(mn){
+var act=mn.dataset.mn,mk=mn.dataset.mk,n=mk?S.notes[mk]:null;
+if(act==="copy"){
+var out=document.getElementById("notesOut"),msg=document.getElementById("msgNotes");
+var txt=notesAsText();
+if(out){out.style.display="block";out.value=txt;out.select();}
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(txt).then(function(){if(msg)msg.textContent="Copied.";},
+function(){if(msg)msg.textContent="Select the text above and copy it.";});}
+else if(msg)msg.textContent="Select the text above and copy it.";
+return;}
+if(act==="purge"){
+if(!confirm("Delete every resolved note? Open notes are kept."))return;
+Object.keys(S.notes).forEach(function(k){if(S.notes[k]&&S.notes[k].d)delete S.notes[k];});
+save();rerender();return;}
+if(!n)return;
+if(act==="edit"){openNote(mk,n.c||"");return;}
+if(act==="done"){n.d=n.d?0:1;n.m=Date.now();save();rerender();return;}
+if(act==="del"){if(confirm("Delete this note?")){delete S.notes[mk];save();rerender();}return;}
+return;
+}
 var rg=e.target.closest("[data-rage]");
 if(rg){
 S.checked["rage:"+rg.dataset.rname]=!S.checked["rage:"+rg.dataset.rname];
@@ -1352,7 +1614,7 @@ if(a){
 var io=document.getElementById("io2"),msg=document.getElementById("msg2");
 var say=function(t){if(msg)msg.textContent=t;};
 if(a.dataset.act==="export"){
-var code=JSON.stringify({checked:S.checked,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated});
+var code=JSON.stringify({checked:S.checked,notes:S.notes,terra:S.terra,celes:S.celes,assign:S.assign,open:open,updated:S.updated});
 if(io){io.value=code;io.select();}
 if(navigator.clipboard&&navigator.clipboard.writeText){
 navigator.clipboard.writeText(code).then(function(){say("Copied \u2014 paste it into Notes.");},
@@ -1360,7 +1622,11 @@ function(){say("Select the text above and copy it.");});}
 else say("Select the text above and copy it.");
 return;}
 if(a.dataset.act==="import"){
-try{var q=JSON.parse(io.value);S.checked=migrateChecked(q.checked||{});S.terra=q.terra||"Magic";
+try{var q=JSON.parse(io.value);S.checked=migrateChecked(q.checked||{});
+/* A code written before notes existed has no notes field. Keep what is on this
+   device rather than silently wiping it. */
+if(q.notes)S.notes=migrateNotes(q.notes);
+S.terra=q.terra||"Magic";
 S.celes=q.celes||"Strength";S.assign=q.assign||{};if(q.open)open=q.open;
 S.updated=Date.now();save();render();
 document.getElementById("msg2").textContent="Progress restored.";}
@@ -1401,6 +1667,99 @@ if(r){S[r.dataset.role]=r.dataset.val;save();render();}
 
 
 
+/* ================= notes: the sheet ================================== */
+var NOTEKEY=null,NOTECTX="";
+function openNote(k,ctx){
+if(!k)return;
+NOTEKEY=k;NOTECTX=ctx||"";
+var n=S.notes[k];
+document.getElementById("noteCtx").textContent=(n&&n.c)||NOTECTX||"(no context)";
+var ta=document.getElementById("noteText");
+ta.value=n?n.t:"";
+var dn=document.getElementById("noteDone");
+dn.textContent=(n&&n.d)?"Reopen":"Resolve";
+dn.hidden=!n;
+document.getElementById("noteDel").hidden=!n;
+var sh=document.getElementById("noteSheet");
+sh.hidden=false;
+/* Force a layout flush so the transition has a start value, rather than waiting
+   on requestAnimationFrame - a backgrounded or non-compositing page never runs
+   the callback, which would leave the sheet mounted at opacity 0 and blocking. */
+void sh.offsetHeight;
+sh.classList.add("show");
+setTimeout(function(){try{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}catch(e){}},70);
+}
+function closeNote(){
+var sh=document.getElementById("noteSheet");
+sh.classList.remove("show");
+try{document.getElementById("noteText").blur();}catch(e){}
+setTimeout(function(){sh.hidden=true;},180);
+NOTEKEY=null;NOTECTX="";
+}
+function commitNote(toggleDone){
+if(!NOTEKEY)return;
+var k=NOTEKEY,txt=document.getElementById("noteText").value.trim();
+if(!txt&&!toggleDone){delete S.notes[k];}
+else if(txt){
+var n=S.notes[k]||{ts:Date.now(),d:0,c:NOTECTX,w:tab};
+n.t=txt;n.m=Date.now();
+if(!n.c)n.c=NOTECTX;
+if(!n.w)n.w=tab;
+if(toggleDone)n.d=n.d?0:1;
+S.notes[k]=n;
+}
+closeNote();save();rerender();
+}
+document.getElementById("noteSheet").addEventListener("click",function(e){
+if(e.target.id==="noteBackdrop"){closeNote();return;}
+var b=e.target.closest("[data-note]");if(!b)return;
+var a=b.dataset.note;
+if(a==="save")commitNote(false);
+else if(a==="done")commitNote(true);
+else if(a==="cancel")closeNote();
+else if(a==="del"){
+if(NOTEKEY)delete S.notes[NOTEKEY];
+closeNote();save();rerender();
+}
+});
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape"&&!document.getElementById("noteSheet").hidden)closeNote();
+});
+(function(){
+var view=document.getElementById("view");
+view.addEventListener("pointerdown",function(e){
+lpCancel();LP.fired=false;
+if(e.pointerType==="mouse"&&e.button!==0)return;   /* right click uses contextmenu */
+var el=e.target.closest("[data-nk]");
+if(!el)return;
+LP.el=el;LP.x=e.clientX;LP.y=e.clientY;
+el.classList.add("lp");
+LP.t=setTimeout(function(){LP.t=null;lpFire(el);},500);
+},{passive:true});
+/* A press that turns into a scroll is a scroll, not a long press. */
+view.addEventListener("pointermove",function(e){
+if(!LP.el)return;
+if(Math.abs(e.clientX-LP.x)>10||Math.abs(e.clientY-LP.y)>10)lpCancel();
+},{passive:true});
+["pointerup","pointercancel","pointerleave"].forEach(function(t){
+view.addEventListener(t,lpCancel,{passive:true});});
+window.addEventListener("scroll",lpCancel,{passive:true});
+/* Capture phase: the tick handler is on #view in the bubble phase, so this is
+   the only place a long press on a checklist row can be stopped from also
+   toggling it on release. */
+view.addEventListener("click",function(e){
+if(LP.fired){LP.fired=false;e.stopPropagation();e.preventDefault();}
+},true);
+/* Doubles as the desktop shortcut and as the suppressor for iOS's own
+   press-and-hold callout, which would otherwise cover the sheet. */
+view.addEventListener("contextmenu",function(e){
+var el=e.target.closest("[data-nk]");
+if(!el)return;
+e.preventDefault();
+lpFire(el);
+});
+})();
+
 if(!CANSTORE){note("Preview mode \u2014 ticks work but will not be saved.");}
 if(LOADFAIL){note("Saved data could not be read. It has been kept as a copy \u2014 use Restore.");}
 render();
@@ -1412,6 +1771,9 @@ CLOUD.pull={status:"ok",err:"",at:Date.now()};
 var remoteUpdated=remote.updated||0;
 if(remoteUpdated>(S.updated||0)){
 S.checked=migrateChecked(remote.checked||{});S.terra=remote.terra||"Magic";S.celes=remote.celes||"Strength";
+/* Same guard as import: a device still running a pre-notes build pushes a payload
+   with no notes field, and pulling that must not delete this device's notes. */
+if(remote.notes)S.notes=migrateNotes(remote.notes);
 S.assign=remote.assign||{};S.updated=remoteUpdated;
 save();render();
 note("Pulled newer progress from cloud.");

@@ -1241,13 +1241,14 @@ var LBL={F:["",""],W:["WAIT","var(--magicite)"],
 N:["TAKE NOW","var(--warn)"],L:["LAST CHANCE","var(--sealed)"]};
 var h='<div class="card"><h3>Treasure — full checklist</h3>'
 +'<div class="bar"><i style="width:'+pct+'%"></i></div>'
-+'<div class="count" style="margin-bottom:9px">'+got+' / '+tot+' containers · '
++'<div class="count" style="margin-bottom:9px">'+got+' / '+tot+' pickups · '
 +chGot+' / '+ch+' chests</div>'
 +'<p class="p"><b>Linked across sections.</b> A container listed at several story points is one physical container — tick it once and it shows as taken everywhere else it appears. Those rows carry a <b style="color:var(--rule)">\u21c4</b> marker.</p>'
 +'<p class="p"><b>Waiting never costs the achievement.</b> The game registers the container, not its contents.</p>'
 +'<p class="p"><b style="color:var(--magicite)">WAIT</b> upgrades later · '
 +'<b style="color:var(--warn)">TAKE NOW</b> gets worse if you leave it · '
-+'<b style="color:var(--sealed)">LAST CHANCE</b> is the final version. Unmarked never changes.</p></div>';
++'<b style="color:var(--sealed)">LAST CHANCE</b> is the final version. Unmarked never changes.</p>'
++'<p class="p"><b>Not everything here is a container.</b> Rows marked <b>Event</b>, <b>Choice</b> or <b>Buy</b> are rewards handed over by a scene, a one-time either/or decision, or a purchase. They count toward pickups but not toward the chest checkpoints below.</p></div>';
 h+='<div class="card"><h3>Checkpoints</h3>'
 +'<p class="p"><b>118 chests</b> before the Floating Continent. <b>122</b> by the end of the World of Balance. Short at either means something upstream was missed.</p>'
 +'<p class="p">Per-zone counts on the in-game map are authoritative. Use this list for <i>which</i> and <i>when</i>, the map for <i>how many</i>.</p></div>';

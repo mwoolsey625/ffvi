@@ -362,13 +362,13 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=a2e91b2"></script>
-<script src="data/rages.js?b=a2e91b2"></script>
-<script src="data/treasure.js?b=a2e91b2"></script>
-<script src="data/gear.js?b=a2e91b2"></script>
-<script src="data/bestiary.js?b=a2e91b2"></script>
-<script src="data/roster.js?b=a2e91b2"></script>
-<script src="data/veldt.js?b=a2e91b2"></script>
+<script src="data/route.js?b=ae821c0"></script>
+<script src="data/rages.js?b=ae821c0"></script>
+<script src="data/treasure.js?b=ae821c0"></script>
+<script src="data/gear.js?b=ae821c0"></script>
+<script src="data/bestiary.js?b=ae821c0"></script>
+<script src="data/roster.js?b=ae821c0"></script>
+<script src="data/veldt.js?b=ae821c0"></script>
 
 <script>
 "use strict";
@@ -1470,7 +1470,7 @@ var ks=noteOrder();
 if(!ks.length)return "No notes.";
 var out=[];
 ks.forEach(function(k){var n=S.notes[k];
-out.push((n.d?"[done] ":"[open] ")+(TABNAME[n.w]||n.w||"?")+" — "+noteWhen(n.ts)
+out.push((n.d?"[done] ":"[open] ")+(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"?"))+" — "+noteWhen(n.ts)
 +"\n  note: "+n.t
 +"\n  on:   "+(n.c||"(no context)"));});
 return out.join("\n\n");
@@ -1491,15 +1491,18 @@ var ks=noteOrder();
 var op=ks.filter(function(k){return !S.notes[k].d;}).length;
 var h='<div class="card"><h3>How this works</h3>'
 +'<p class="p"><b>Press and hold</b> any line anywhere in the app for half a second — a walkthrough step, a checklist row, a section header, a table row — and a box opens where you can type. The line then carries a <b style="color:var(--warn)">✎</b> so you can see at a glance that you flagged it.</p>'
-+'<p class="p">Nothing you write is ever thrown away. Each note keeps a copy of the text it was attached to, so even if that line is later edited or removed, the note still shows what it was about.</p></div>';
++'<p class="p">Nothing you write is ever thrown away. Each note keeps a copy of the text it was attached to, so even if that line is later edited or removed, the note still shows what it was about.</p>'
++'<p class="p">For anything that is not about one particular line — an idea, a question, something the app itself should do differently — use <b>Add a general note</b> below.</p></div>';
 
 if(!ks.length){
 return h+'<div class="card"><h3>Nothing flagged yet</h3>'
-+'<p class="p">Long-press anything that looks wrong while you play. Come back here to read them all in one place.</p></div>';
++'<p class="p">Long-press anything that looks wrong while you play. Come back here to read them all in one place.</p>'
++'<button class="seg" type="button" data-mn="new">Add a general note</button></div>';
 }
 
 h+='<div class="card"><h3>'+op+' open · '+(ks.length-op)+' resolved</h3>'
 +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
++'<button class="seg" type="button" data-mn="new">Add a general note</button>'
 +'<button class="seg" type="button" data-mn="copy">Copy all as text</button>'
 +(ks.length-op?'<button class="seg" type="button" data-mn="purge">Delete resolved</button>':"")
 +'</div>'
@@ -1519,7 +1522,7 @@ h+='<div class="sect" style="border-left-color:'+(isDone?"var(--sealed)":"var(--
 h+='<div class="note-row'+(isDone?" done":"")+'">'
 +'<div class="note-body">'+esc(n.t)+'</div>'
 +(n.c?'<div class="note-ctx">'+esc(n.c)+'</div>':"")
-+'<div class="note-meta">'+esc(TABNAME[n.w]||n.w||"—")+' · '+esc(noteWhen(n.ts))+'</div>'
++'<div class="note-meta">'+esc(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"—"))+' · '+esc(noteWhen(n.ts))+'</div>'
 +'<div class="note-acts">'
 +'<button class="seg" type="button" data-mn="edit" data-mk="'+esc(k)+'">Edit</button>'
 +'<button class="seg" type="button" data-mn="done" data-mk="'+esc(k)+'">'+(isDone?"Reopen":"Resolve")+'</button>'
@@ -1592,6 +1595,7 @@ if(act==="purge"){
 if(!confirm("Delete every resolved note? Open notes are kept."))return;
 Object.keys(S.notes).forEach(function(k){if(S.notes[k]&&S.notes[k].d)delete S.notes[k];});
 save();rerender();return;}
+if(act==="new"){openNote("gen:"+Date.now(),"General note — not tied to any line");return;}
 if(!n)return;
 if(act==="edit"){openNote(mk,n.c||"");return;}
 if(act==="done"){n.d=n.d?0:1;n.m=Date.now();save();rerender();return;}

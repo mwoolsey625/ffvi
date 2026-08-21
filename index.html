@@ -306,7 +306,9 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 .note-ctx{font-size:11.5px;color:var(--ink-dim);line-height:1.45;margin-top:6px;
   border-left:2px solid var(--rule-dim);padding-left:9px}
 .note-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--rule);margin-top:8px}
+.note-reply{font-size:12.5px;line-height:1.5;color:var(--sealed);margin-top:8px;padding-left:10px;border-left:2px solid var(--sealed);white-space:pre-wrap}
 .note-acts{display:flex;gap:7px;margin-top:10px}
+.note-flash{outline:2px solid var(--warn);outline-offset:3px;border-radius:6px}
 .note-acts .seg{padding:7px 12px;min-height:34px;font-size:10px}
 
 @media (hover:hover){
@@ -362,17 +364,19 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=adcba73"></script>
-<script src="data/rages.js?b=adcba73"></script>
-<script src="data/treasure.js?b=adcba73"></script>
-<script src="data/gear.js?b=adcba73"></script>
-<script src="data/bestiary.js?b=adcba73"></script>
-<script src="data/roster.js?b=adcba73"></script>
-<script src="data/veldt.js?b=adcba73"></script>
+<script src="data/route.js?b=6142bad"></script>
+<script src="data/rages.js?b=6142bad"></script>
+<script src="data/treasure.js?b=6142bad"></script>
+<script src="data/gear.js?b=6142bad"></script>
+<script src="data/bestiary.js?b=6142bad"></script>
+<script src="data/roster.js?b=6142bad"></script>
+<script src="data/veldt.js?b=6142bad"></script>
+<script src="data/notereplies.js?b=6142bad"></script>
 
 <script>
 "use strict";
 var KEY = "ff6pr-tracker-v1";
+var NREPLY=(typeof NOTEREPLY!=="undefined")?NOTEREPLY:{};
 var GIST_KEY = "ff6pr-gist-id";
 var TOKEN_KEY = "ff6pr-gist-token";
 /* Permanent fallback so a fully wiped device (Safari "Clear website data",
@@ -1472,7 +1476,8 @@ var out=[];
 ks.forEach(function(k){var n=S.notes[k];
 out.push((n.d?"[done] ":"[open] ")+(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"?"))+" — "+noteWhen(n.ts)
 +"\n  note: "+n.t
-+"\n  on:   "+(n.c||"(no context)"));});
++"\n  on:   "+(n.c||"(no context)")
++(NREPLY[k]?"\n  fix:  "+NREPLY[k]:""));});
 return out.join("\n\n");
 }
 function noteOrder(){
@@ -1485,6 +1490,56 @@ if((x.d?1:0)!==(y.d?1:0))return (x.d?1:0)-(y.d?1:0);
 return (y.m||y.ts||0)-(x.m||x.ts||0);
 });
 return ks;
+}
+/* Jump from a note to the line it was written on. k: keys are looked up in the
+   stop key lists; h: keys are reversed by re-hashing the note's saved context
+   against every stop title, since the hash itself is one-way. A note whose
+   anchor text has since been edited cannot be found - say so instead of
+   guessing. */
+function switchTab(name){
+tabScroll[tab]=window.scrollY;
+tab=name;
+document.querySelectorAll("#navList button").forEach(function(x){
+var onx=x.dataset.tab===name;
+x.setAttribute("aria-selected",onx);
+if(onx)document.getElementById("hdrTab").textContent=x.textContent;
+});
+render();
+}
+function findRouteStop(raw,n){
+if(raw.indexOf("k:")===0){
+var dk=raw.slice(2);
+for(var i=0;i<ROUTE.length;i++){if(stopKeys(ROUTE[i]).indexOf(dk)>-1)return i;}
+return -1;
+}
+if(raw.indexOf("h:")!==0||!n.c)return -1;
+var t=n.c.slice(0,300);
+var TAG={once:"ONE VISIT",wob:"WoB ONLY",timed:"TIMED"};
+for(var i=0;i<ROUTE.length;i++){
+var r=ROUTE[i];
+var scope=r[0]+(TAG[r[7]]?" "+TAG[r[7]]:"");
+if("h:"+noteHash("route|"+scope+"|"+t)===raw)return i;
+if("h:"+noteHash("route|"+r[0]+"|"+t)===raw)return i;
+}
+return -1;
+}
+function noteJump(k){
+var n=S.notes[k];if(!n)return;
+var dest=(n.w&&n.w!=="mynotes"&&n.w!=="settings")?n.w:"route";
+var raw=k.replace(/#\d+$/,"");
+if(dest==="route"){
+var si=findRouteStop(raw,n);
+if(si>-1){
+open["r"+si]=true;
+["t","m","e","c","p","s"].forEach(function(sfx){open["r"+si+sfx]=true;});
+}
+}
+switchTab(dest);
+var el=document.querySelector('[data-nk="'+k.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'"]');
+if(!el){switchTab("mynotes");note("Could not find that line — its text may have changed since the note was written.");return;}
+el.scrollIntoView({block:"center"});
+el.classList.add("note-flash");
+setTimeout(function(){el.classList.remove("note-flash");},2600);
 }
 function myNotesHTML(){
 var ks=noteOrder();
@@ -1522,8 +1577,10 @@ h+='<div class="sect" style="border-left-color:'+(isDone?"var(--sealed)":"var(--
 h+='<div class="note-row'+(isDone?" done":"")+'">'
 +'<div class="note-body">'+esc(n.t)+'</div>'
 +(n.c?'<div class="note-ctx">'+esc(n.c)+'</div>':"")
++(NREPLY[k]?'<div class="note-reply">↳ '+esc(NREPLY[k])+'</div>':"")
 +'<div class="note-meta">'+esc(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"—"))+' · '+esc(noteWhen(n.ts))+'</div>'
 +'<div class="note-acts">'
++(!isDone&&k.indexOf("gen:")!==0?'<button class="seg" type="button" data-mn="goto" data-mk="'+esc(k)+'">Go to</button>':"")
 +'<button class="seg" type="button" data-mn="edit" data-mk="'+esc(k)+'">Edit</button>'
 +'<button class="seg" type="button" data-mn="done" data-mk="'+esc(k)+'">'+(isDone?"Reopen":"Resolve")+'</button>'
 +'<button class="seg" type="button" data-mn="del" data-mk="'+esc(k)+'" style="color:var(--warn)">Delete</button>'
@@ -1596,6 +1653,7 @@ if(!confirm("Delete every resolved note? Open notes are kept."))return;
 Object.keys(S.notes).forEach(function(k){if(S.notes[k]&&S.notes[k].d)delete S.notes[k];});
 save();rerender();return;}
 if(act==="new"){openNote("gen:"+Date.now(),"General note — not tied to any line");return;}
+if(act==="goto"){noteJump(mk);return;}
 if(!n)return;
 if(act==="edit"){openNote(mk,n.c||"");return;}
 if(act==="done"){n.d=n.d?0:1;n.m=Date.now();save();rerender();return;}

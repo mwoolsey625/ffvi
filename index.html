@@ -316,6 +316,9 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 .note-reply{font-size:12.5px;line-height:1.5;color:var(--sealed);margin-top:8px;padding-left:10px;border-left:2px solid var(--sealed);white-space:pre-wrap}
 .note-acts{display:flex;gap:7px;margin-top:10px}
 .note-flash{outline:2px solid var(--warn);outline-offset:3px;border-radius:6px}
+#imgSheet{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(4,7,20,.9);cursor:zoom-out;overflow:auto;padding:12px}
+#imgSheet[hidden]{display:none}
+#imgSheet img{max-width:min(97vw,760px);max-height:none;width:100%;height:auto;border:1px solid var(--hair);border-radius:var(--r-md);background:var(--field);margin:auto}
 .note-acts .seg{padding:7px 12px;min-height:34px;font-size:10px}
 
 @media (hover:hover){
@@ -354,6 +357,7 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 
 <main id="view"></main>
 
+<div id="imgSheet" hidden><img alt="Route map"></div>
 <div id="noteSheet" hidden>
   <div id="noteBackdrop"></div>
   <div id="noteBox" role="dialog" aria-modal="true" aria-label="Note">
@@ -371,14 +375,14 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=0fce8bf"></script>
-<script src="data/rages.js?b=0fce8bf"></script>
-<script src="data/treasure.js?b=0fce8bf"></script>
-<script src="data/gear.js?b=0fce8bf"></script>
-<script src="data/bestiary.js?b=0fce8bf"></script>
-<script src="data/roster.js?b=0fce8bf"></script>
-<script src="data/veldt.js?b=0fce8bf"></script>
-<script src="data/notereplies.js?b=0fce8bf"></script>
+<script src="data/route.js?b=871b66c"></script>
+<script src="data/rages.js?b=871b66c"></script>
+<script src="data/treasure.js?b=871b66c"></script>
+<script src="data/gear.js?b=871b66c"></script>
+<script src="data/bestiary.js?b=871b66c"></script>
+<script src="data/roster.js?b=871b66c"></script>
+<script src="data/veldt.js?b=871b66c"></script>
+<script src="data/notereplies.js?b=871b66c"></script>
 
 <script>
 "use strict";
@@ -656,6 +660,9 @@ if(r[2]) h+='<div class="seal-line">Last chance before: <b>'+esc(r[2])+'</b></di
 if(r[7]==="wob") h+='<div class="seal-line">Not available in the <b>World of Ruin</b></div>';
 if(r[7]==="once") h+='<div class="seal-line">Single visit \u2014 <b>no way back</b></div>';
 if(r[7]==="timed") h+='<div class="seal-line"><b>Timer running</b> once you enter</div>';
+if(r[11]&&r[11].length){r[11].forEach(function(im){
+h+='<button class="seg" type="button" data-img="'+esc(im[1])+'" style="margin:8px 0 4px;color:var(--cyan)">'+esc(im[0])+'</button>';
+});}
 if(r[10]&&r[10].length){
 var skp="r"+ri+"p";
 h+=sect("Party",r[10].length,null,"var(--sealed)",null,skp,false);
@@ -1678,6 +1685,8 @@ if(rg){
 S.checked["rage:"+rg.dataset.rname]=!S.checked["rage:"+rg.dataset.rname];
 save();render();
 return;}
+var im=e.target.closest("[data-img]");
+if(im){var ish=document.getElementById("imgSheet");ish.querySelector("img").src=im.dataset.img;ish.hidden=false;return;}
 var g=e.target.closest("[data-gate]");
 if(g){open[g.dataset.gate]=!open[g.dataset.gate];render();return;}
 var k=e.target.closest("[data-key]");
@@ -1797,8 +1806,10 @@ if(NOTEKEY)delete S.notes[NOTEKEY];
 closeNote();save();rerender();
 }
 });
+document.getElementById("imgSheet").addEventListener("click",function(){this.hidden=true;});
 document.addEventListener("keydown",function(e){
 if(e.key==="Escape"&&!document.getElementById("noteSheet").hidden)closeNote();
+if(e.key==="Escape"&&!document.getElementById("imgSheet").hidden)document.getElementById("imgSheet").hidden=true;
 });
 (function(){
 var view=document.getElementById("view");

@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 810" font-family="ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#A98CF0"/>
+    </marker>
+  </defs>
+  <rect width="760" height="810" fill="#0A0F26"/>
+
+  <!-- title -->
+  <text x="30" y="42" fill="#EDF1FF" font-size="24" font-weight="700">Imperial Palace — banquet walkabout</text>
+  <text x="30" y="66" fill="#8FA0CE" font-size="13.5">4:00 on the clock · 24 soldiers · schematic order, not to scale</text>
+
+  <!-- legend -->
+  <g font-size="12.5">
+    <rect x="30" y="80" width="700" height="32" rx="9" fill="#141B3C" stroke="rgba(255,255,255,.075)"/>
+    <circle cx="52" cy="96" r="9" fill="#6FC5E8"/><text x="52" y="100" fill="#0A0F26" font-weight="700" font-size="11" text-anchor="middle">n</text>
+    <text x="68" y="100" fill="#8FA0CE">soldiers in the room</text>
+    <text x="210" y="100" fill="#F5B65E" font-weight="700">⚔ fight — win it, +5 pts</text>
+    <text x="392" y="100" fill="#F5B65E">⛔ skip</text>
+    <rect x="452" y="84" width="44" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="474" y="100" fill="#A98CF0" font-weight="700" text-anchor="middle">24</text>
+    <text x="504" y="100" fill="#8FA0CE">running total when the room is done</text>
+  </g>
+
+  <!-- 1 entrance hall -->
+  <g>
+    <rect x="30" y="140" width="330" height="96" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="58" cy="168" r="14" fill="#A98CF0"/><text x="58" y="173" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">1</text>
+    <text x="82" y="173" fill="#EDF1FF" font-size="16" font-weight="600">Entrance hall</text>
+    <text x="46" y="198" fill="#8FA0CE" font-size="13.5">Walk straight in and talk to the</text>
+    <text x="46" y="218" fill="#8FA0CE" font-size="13.5">four soldiers ahead.</text>
+    <circle cx="322" cy="168" r="11" fill="#6FC5E8"/><text x="322" y="173" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">4</text>
+    <rect x="292" y="200" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="318" y="217" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">4</text>
+  </g>
+
+  <!-- 2 corridor / jail -->
+  <g>
+    <rect x="30" y="256" width="330" height="112" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="58" cy="284" r="14" fill="#A98CF0"/><text x="58" y="289" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">2</text>
+    <text x="82" y="289" fill="#EDF1FF" font-size="16" font-weight="600">Corridor to the stairs</text>
+    <text x="46" y="314" fill="#F5B65E" font-size="13.5" font-weight="700">⛔ FIRST DOOR = KEFKA'S JAIL.</text>
+    <text x="46" y="334" fill="#8FA0CE" font-size="13.5">He burns the timer for nothing.</text>
+    <text x="46" y="354" fill="#8FA0CE" font-size="13.5">Walk past and take the stairs up.</text>
+  </g>
+
+  <!-- 3 room off the stairs -->
+  <g>
+    <rect x="30" y="388" width="330" height="112" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="58" cy="416" r="14" fill="#A98CF0"/><text x="58" y="421" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">3</text>
+    <text x="82" y="421" fill="#EDF1FF" font-size="16" font-weight="600">Room off the stairs</text>
+    <text x="46" y="446" fill="#8FA0CE" font-size="13.5">A soldier, a Special Forces trooper,</text>
+    <text x="46" y="466" fill="#8FA0CE" font-size="13.5">and one more in the bathroom.</text>
+    <circle cx="322" cy="416" r="11" fill="#6FC5E8"/><text x="322" y="421" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">3</text>
+    <rect x="292" y="448" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="318" y="465" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">7</text>
+  </g>
+
+  <!-- 4 balcony + cabin -->
+  <g>
+    <rect x="30" y="520" width="330" height="142" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="58" cy="548" r="14" fill="#A98CF0"/><text x="58" y="553" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">4</text>
+    <text x="82" y="553" fill="#EDF1FF" font-size="16" font-weight="600">Balcony, up the next stairs</text>
+    <text x="46" y="578" fill="#8FA0CE" font-size="13.5">Five soldiers along the balcony.</text>
+    <text x="46" y="603" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ The soldier in the rooftop cabin</text>
+    <text x="46" y="623" fill="#F5B65E" font-size="13.5" font-weight="700">challenges you — fight and win.</text>
+    <text x="46" y="646" fill="#8FA0CE" font-size="13.5">Exit by the door past the cabin.</text>
+    <circle cx="322" cy="548" r="11" fill="#6FC5E8"/><text x="322" y="553" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">6</text>
+    <rect x="292" y="580" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="318" y="597" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">13</text>
+  </g>
+
+  <!-- 5 far room -->
+  <g>
+    <rect x="400" y="140" width="330" height="96" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="428" cy="168" r="14" fill="#A98CF0"/><text x="428" y="173" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">5</text>
+    <text x="452" y="173" fill="#EDF1FF" font-size="16" font-weight="600">Room past the cabin</text>
+    <text x="416" y="198" fill="#8FA0CE" font-size="13.5">One wandering soldier, then head</text>
+    <text x="416" y="218" fill="#8FA0CE" font-size="13.5">back down the far side.</text>
+    <circle cx="692" cy="168" r="11" fill="#6FC5E8"/><text x="692" y="173" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">1</text>
+    <rect x="662" y="200" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="688" y="217" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">14</text>
+  </g>
+
+  <!-- 6 bedroom + bath -->
+  <g>
+    <rect x="400" y="256" width="330" height="168" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="428" cy="284" r="14" fill="#A98CF0"/><text x="428" y="289" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">6</text>
+    <text x="452" y="289" fill="#EDF1FF" font-size="16" font-weight="600">Bedroom — first new door</text>
+    <text x="416" y="314" fill="#8FA0CE" font-size="13.5">Six soldiers: four wandering below</text>
+    <text x="416" y="334" fill="#8FA0CE" font-size="13.5">the bed, one in it, one above.</text>
+    <text x="416" y="359" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ One of the wanderers challenges you.</text>
+    <text x="416" y="381" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ So does the soldier in the bathroom.</text>
+    <text x="416" y="406" fill="#8FA0CE" font-size="13.5">Win both before leaving the room.</text>
+    <circle cx="692" cy="284" r="11" fill="#6FC5E8"/><text x="692" y="289" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">7</text>
+    <rect x="662" y="316" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="688" y="333" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">21</text>
+  </g>
+
+  <!-- 7 outside front -->
+  <g>
+    <rect x="400" y="444" width="330" height="140" rx="12" fill="#141B3C" stroke="rgba(160,180,235,.28)"/>
+    <circle cx="428" cy="472" r="14" fill="#A98CF0"/><text x="428" y="477" fill="#0A0F26" font-weight="700" font-size="15" text-anchor="middle">7</text>
+    <text x="452" y="477" fill="#EDF1FF" font-size="16" font-weight="600">Out the front doors</text>
+    <text x="416" y="502" fill="#8FA0CE" font-size="13.5">⛔ Skip the next door inside — treasure</text>
+    <text x="416" y="522" fill="#8FA0CE" font-size="13.5">only. Outside: two soldiers, and</text>
+    <text x="416" y="547" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ the ARMORED soldier — the fourth</text>
+    <text x="416" y="567" fill="#F5B65E" font-size="13.5" font-weight="700">and last walkabout fight.</text>
+    <circle cx="692" cy="472" r="11" fill="#6FC5E8"/><text x="692" y="477" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">3</text>
+    <rect x="662" y="504" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
+    <text x="688" y="521" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">24</text>
+  </g>
+
+  <!-- dinner box -->
+  <g>
+    <rect x="400" y="604" width="330" height="64" rx="12" fill="#141B3C" stroke="rgba(79,211,166,.5)"/>
+    <text x="416" y="630" fill="#4FD3A6" font-size="14" font-weight="700">Then dinner — answers are on the stop.</text>
+    <text x="416" y="652" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ 5th fight at the break: win inside 2:00.</text>
+  </g>
+
+  <!-- path arrows -->
+  <g stroke="#A98CF0" stroke-width="3" fill="none" marker-end="url(#ah)" opacity=".9">
+    <path d="M195 238v14"/>
+    <path d="M195 370v14"/>
+    <path d="M195 502v14"/>
+    <path d="M364 555C390 555 372 188 396 188"/>
+    <path d="M565 238v14"/>
+    <path d="M565 426v14"/>
+    <path d="M565 586v14"/>
+  </g>
+
+  <!-- footer rules -->
+  <g font-size="13">
+    <rect x="30" y="690" width="700" height="96" rx="12" fill="#141B3C" stroke="rgba(255,255,255,.075)"/>
+    <text x="46" y="716" fill="#4FD3A6" font-weight="700">Leave every chest shut during the timer — the palace stays open after the banquet.</text>
+    <text x="46" y="740" fill="#8FA0CE">1 pt per talk · +5 per fight won — losing or fleeing keeps only the 1 · up to 3 passive soldiers are slack.</text>
+    <text x="46" y="762" fill="#8FA0CE">Win all five fights and both event-only bestiary entries (#92, #93) register, whichever fight is which.</text>
+    <text x="46" y="781" fill="#A98CF0">Rewards · 50+: Doma opens · 67+: Observation Post storehouse · 77+: Tintinnabulum · ~91+: Ward Bangle</text>
+  </g>
+</svg>

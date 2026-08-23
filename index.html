@@ -375,14 +375,14 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=d26ab6f"></script>
-<script src="data/rages.js?b=d26ab6f"></script>
-<script src="data/treasure.js?b=d26ab6f"></script>
-<script src="data/gear.js?b=d26ab6f"></script>
-<script src="data/bestiary.js?b=d26ab6f"></script>
-<script src="data/roster.js?b=d26ab6f"></script>
-<script src="data/veldt.js?b=d26ab6f"></script>
-<script src="data/notereplies.js?b=d26ab6f"></script>
+<script src="data/route.js?b=5341865"></script>
+<script src="data/rages.js?b=5341865"></script>
+<script src="data/treasure.js?b=5341865"></script>
+<script src="data/gear.js?b=5341865"></script>
+<script src="data/bestiary.js?b=5341865"></script>
+<script src="data/roster.js?b=5341865"></script>
+<script src="data/veldt.js?b=5341865"></script>
+<script src="data/notereplies.js?b=5341865"></script>
 
 <script>
 "use strict";
@@ -1087,15 +1087,15 @@ function veldtTrackingHTML(){
   var isOpen=open["vtrack"]===undefined?true:!!open["vtrack"];
   var h='<div class="gate">';
   h+='<button class="gate-head" data-gate="vtrack" aria-expanded="'+isOpen+'">';
-  h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">Tracking — Rages we want</span>';
+  h+='<span class="chev">'+(isOpen?"▼":"▶")+'</span><span class="gate-title">Tracking — Rage bank</span>';
   h+='<span class="tally">'+RAGES.filter(function(r){return !!S.checked["rage:"+r.n];}).length+'/'+RAGES.length+' banked</span></button>';
   if(isOpen){
     h+='<div class="gbody">';
-    h+='<div class="sect-note">Front-load these before the Veldt pool gets crowded — see the Rages section above for why. Checking a rage off here stays in sync with that table, and marks every group below that carries it with a ◎ TARGET tag.</div>';
+    h+='<div class="sect-note">A tick here means the Rage is BANKED — you have it. It stays in sync with the Rages table above. The ◎ TARGET tag and highlights below mark the groups still carrying a Rage you have NOT banked yet; ticking the Rage clears them. Front-load these before the Veldt pool gets crowded — see the Rages section above for why.</div>';
     RAGES.forEach(function(r){
       var on=!!S.checked["rage:"+r.n];
       var hits=veldtHits(r.num);
-      var noHits=on&&hits.length===0;
+      var noHits=!on&&hits.length===0;
       h+='<button class="item'+(on?" on":"")+(noHits?" no-hits":"")+'" data-rage="'+r.num+'" data-rname="'+esc(r.n)+'" aria-pressed="'+on+'">'
       +'<span class="box">'+(on?"✓":"")+'</span><span>'+esc(r.n)
       +(noHits?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">⚠ NO VELDT FORMATION FOUND</span>':"")
@@ -1137,7 +1137,9 @@ function veldtHTML(){
   h+=veldtTrackingHTML();
 
   var trackedNums={};
-  RAGES.forEach(function(r){if(S.checked["rage:"+r.n])trackedNums[r.num]=1;});
+  /* Target what is still MISSING: checked means banked, so the group tags and
+     highlights track the complement — the rages not yet in hand. */
+  RAGES.forEach(function(r){if(!S.checked["rage:"+r.n])trackedNums[r.num]=1;});
 
   VELDT.forEach(function(p,gi){
     if(p.e){

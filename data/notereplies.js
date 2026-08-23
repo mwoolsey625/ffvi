@@ -4,5 +4,7 @@
    harmless and gets pruned in a later commit. This file never touches saved
    progress. */
 var NOTEREPLY={
-"h:1foszhk-12gqztz":"Pinned in build 9dcde2c from your run: #93 MEGA ARMOR is the armored soldier out front, #92 IMPERIAL ELITE is the dinner-break fight. Caves of Narshe had it right; jinsoku's assignment was wrong. Route bullet, walkabout map, bestiary and gate labels all updated."
+"h:1foszhk-12gqztz":"Pinned in build 9dcde2c from your run: #93 MEGA ARMOR is the armored soldier out front, #92 IMPERIAL ELITE is the dinner-break fight. Caves of Narshe had it right; jinsoku's assignment was wrong. Route bullet, walkabout map, bestiary and gate labels all updated.",
+"h:1ivjy1s-al8hfj":"Fixed in build d26ab6f: it was more than 4 — 18 gate rows duplicated a Treasure row (Imperial Camp, Sealed Gate cave, Burning House, Esper Cave, Tzen, both choice records, the Celes-cave X-Potion). Each pair is now one shared checkbox.",
+"h:ekbqm8-1pdnvo":"Fixed in build d26ab6f: one tap now ticks both places — checking an item under Missable checks its Treasure row and vice versa, and the total stops counting it twice (581 → 563). Ticks you already made under either row carry over automatically."
 };

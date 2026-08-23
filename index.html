@@ -375,14 +375,14 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=9dcde2c"></script>
-<script src="data/rages.js?b=9dcde2c"></script>
-<script src="data/treasure.js?b=9dcde2c"></script>
-<script src="data/gear.js?b=9dcde2c"></script>
-<script src="data/bestiary.js?b=9dcde2c"></script>
-<script src="data/roster.js?b=9dcde2c"></script>
-<script src="data/veldt.js?b=9dcde2c"></script>
-<script src="data/notereplies.js?b=9dcde2c"></script>
+<script src="data/route.js?b=d26ab6f"></script>
+<script src="data/rages.js?b=d26ab6f"></script>
+<script src="data/treasure.js?b=d26ab6f"></script>
+<script src="data/gear.js?b=d26ab6f"></script>
+<script src="data/bestiary.js?b=d26ab6f"></script>
+<script src="data/roster.js?b=d26ab6f"></script>
+<script src="data/veldt.js?b=d26ab6f"></script>
+<script src="data/notereplies.js?b=d26ab6f"></script>
 
 <script>
 "use strict";
@@ -409,10 +409,37 @@ var AREA_RENAMES={
 "Jidoor, Owzer's house":"Owzer's Mansion",
 "Narshe, Umaro's cave":"Yeti's Cave",
 "Triangle Island, Gogo's lair":"Zone Eater's Belly"};
+/* Gate rows that duplicated a Treasure row were merged onto the treasure key.
+   Old saves may carry ticks under the retired gate keys; fold them in with OR
+   semantics — either row having been checked means the item is done. */
+var MERGED_GATE_KEYS={
+"g2:0":["t:Returners' Hideout:9"],
+"g3:2":["tg:g5"],
+"g4:0":["t:Imperial Camp:0"],
+"g4:1":["t:Imperial Camp:2"],
+"g4:2":["t:Imperial Camp:1"],
+"g4:3":["t:Imperial Camp:3"],
+"g10:0":["t:Narshe, the return:1"],
+"g11:5":["t:Cave to the Sealed Gate:16"],
+"g11:6":["t:Cave to the Sealed Gate:5"],
+"g11:7":["t:Cave to the Sealed Gate:3"],
+"g11:8":["t:Cave to the Sealed Gate:1"],
+"g13:1":["t:Burning House:0"],
+"g13:2":["t:Burning House:1"],
+"g14:0":["t:Esper Cave:0"],
+"g14:1":["t:Esper Cave:1","t:Esper Cave:2"],
+"g14:2":["t:Esper Cave:3"],
+"g20:0":["t:Tzen, collapsing house:0"],
+"g20:1":["t:Tzen, collapsing house:7"]
+};
 function migrateChecked(c){
 if(!c)return {};
 var out={},moved=0;
 for(var k in c){ if(!Object.prototype.hasOwnProperty.call(c,k)){continue;}
+if(MERGED_GATE_KEYS[k]){
+if(c[k])MERGED_GATE_KEYS[k].forEach(function(tk){out[tk]=true;});
+continue;
+}
 var nk=k;
 if(k.indexOf("t:")===0){
 var cut=k.lastIndexOf(":");            /* index is always the last segment */
@@ -521,9 +548,12 @@ cb(remote,null);
 }
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function allKeys(){var a={};ROUTE.forEach(function(r){stopKeys(r).forEach(function(k){a[k]=1;});});return Object.keys(a);}
-function itemKey(g,it,i){var p=String(it).split("|");return p[1]?"b:"+p[1]:g.id+":"+i;}
+/* A gate item's "|" suffix is a shared key: a bare number means bestiary
+   ("b:NN"), anything with a colon is a treasure key used verbatim, so the
+   Missable row and the Treasure row are one checkbox, not two. */
+function itemKey(g,it,i){var p=String(it).split("|");if(!p[1])return g.id+":"+i;return p[1].indexOf(":")>-1?p[1]:"b:"+p[1];}
 function itemLabel(it){return String(it).split("|")[0];}
-function itemNum(it){var p=String(it).split("|");return p[1]||"";}
+function itemNum(it){var p=String(it).split("|");return p[1]&&p[1].indexOf(":")<0?p[1]:"";}
 function progress(){var k=allKeys(),d=0;k.forEach(function(x){if(S.checked[x])d++;});return{d:d,t:k.length};}
 function renderHead(){
 var p=progress(),pct=p.t?Math.round(p.d/p.t*100):0;

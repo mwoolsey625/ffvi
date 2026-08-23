@@ -27,7 +27,7 @@
     <rect x="30" y="122" width="700" height="96" rx="12" fill="#141B3C" stroke="rgba(255,255,255,.075)"/>
     <text x="46" y="148" fill="#4FD3A6" font-weight="700">Leave every chest shut during the timer — the palace stays open after the banquet.</text>
     <text x="46" y="172" fill="#8FA0CE">1 pt per talk · +5 per fight won — losing or fleeing keeps only the 1 · up to 3 passive soldiers are slack.</text>
-    <text x="46" y="194" fill="#8FA0CE">Win all five fights and both event-only bestiary entries (#92, #93) register, whichever fight is which.</text>
+    <text x="46" y="194" fill="#8FA0CE">Win all five fights — the armored soldier is MEGA ARMOR (#93); the dinner-break fight is IMPERIAL ELITE (#92).</text>
     <text x="46" y="213" fill="#A98CF0">Rewards · 50+: Doma opens · 67+: Observation Post storehouse · 77+: Tintinnabulum · ~91+: Ward Bangle</text>
   </g>
 
@@ -113,8 +113,8 @@
     <text x="452" y="577" fill="#EDF1FF" font-size="16" font-weight="600">Out the front doors</text>
     <text x="416" y="602" fill="#8FA0CE" font-size="13.5">⛔ Skip the next door inside — treasure</text>
     <text x="416" y="622" fill="#8FA0CE" font-size="13.5">only. Outside: two soldiers, and</text>
-    <text x="416" y="647" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ the ARMORED soldier — the fourth</text>
-    <text x="416" y="667" fill="#F5B65E" font-size="13.5" font-weight="700">and last walkabout fight.</text>
+    <text x="416" y="647" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ the ARMORED soldier — MEGA ARMOR</text>
+    <text x="416" y="667" fill="#F5B65E" font-size="13.5" font-weight="700">(#93), the last walkabout fight.</text>
     <circle cx="692" cy="572" r="11" fill="#6FC5E8"/><text x="692" y="577" fill="#0A0F26" font-weight="700" font-size="12" text-anchor="middle">3</text>
     <rect x="662" y="604" width="52" height="24" rx="12" fill="#1E2854" stroke="rgba(160,180,235,.28)"/>
     <text x="688" y="621" fill="#A98CF0" font-weight="700" font-size="13" text-anchor="middle">24</text>
@@ -122,9 +122,10 @@
 
   <!-- dinner box -->
   <g>
-    <rect x="400" y="704" width="330" height="64" rx="12" fill="#141B3C" stroke="rgba(79,211,166,.5)"/>
+    <rect x="400" y="704" width="330" height="86" rx="12" fill="#141B3C" stroke="rgba(79,211,166,.5)"/>
     <text x="416" y="730" fill="#4FD3A6" font-size="14" font-weight="700">Then dinner — answers are on the stop.</text>
-    <text x="416" y="752" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ 5th fight at the break: win inside 2:00.</text>
+    <text x="416" y="752" fill="#F5B65E" font-size="13.5" font-weight="700">⚔ 5th fight at the break — IMPERIAL</text>
+    <text x="416" y="774" fill="#F5B65E" font-size="13.5" font-weight="700">ELITE (#92). Win it inside 2:00.</text>
   </g>
 
   <!-- path arrows -->

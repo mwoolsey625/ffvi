@@ -187,6 +187,11 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--magicite);out
 }
 .item.on .box{background:var(--sealed);border-color:var(--sealed);box-shadow:0 0 10px -2px rgba(79,211,166,.6)}
 .item.on span:last-child{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--rule-dim)}
+/* WAIT rows: shown for context, ticked only from their LAST CHANCE stop */
+.item.wait{cursor:default}
+.item.wait:active{background:transparent}
+.item.wait .box{border-style:dashed;border-color:var(--magicite);color:var(--magicite);font-size:10px}
+.item.wait.on .box{border-style:solid;border-color:var(--sealed);color:var(--field)}
 .item.no-hits{border-left:3px solid var(--warn);background:rgba(245,182,94,.06);border-radius:0 var(--r-md) var(--r-md) 0}
 .item.no-hits span:last-child{color:var(--ink);text-decoration:none}
 .item.auto{cursor:default}
@@ -375,14 +380,14 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=e91fb9e"></script>
-<script src="data/rages.js?b=e91fb9e"></script>
-<script src="data/treasure.js?b=e91fb9e"></script>
-<script src="data/gear.js?b=e91fb9e"></script>
-<script src="data/bestiary.js?b=e91fb9e"></script>
-<script src="data/roster.js?b=e91fb9e"></script>
-<script src="data/veldt.js?b=e91fb9e"></script>
-<script src="data/notereplies.js?b=e91fb9e"></script>
+<script src="data/route.js?b=a3d2e33"></script>
+<script src="data/rages.js?b=a3d2e33"></script>
+<script src="data/treasure.js?b=a3d2e33"></script>
+<script src="data/gear.js?b=a3d2e33"></script>
+<script src="data/bestiary.js?b=a3d2e33"></script>
+<script src="data/roster.js?b=a3d2e33"></script>
+<script src="data/veldt.js?b=a3d2e33"></script>
+<script src="data/notereplies.js?b=a3d2e33"></script>
 
 <script>
 "use strict";
@@ -637,8 +642,10 @@ r[4].forEach(function(id){var g=gateById(id); if(!g)return;
 g.items.forEach(function(it,i){out[itemKey(g,it,i)]=1;});});
 r[5].forEach(function(bi){var bl=BEST[bi]; if(!bl)return;
 bl.e.forEach(function(x){if(!isMandatoryBoss(x)) out["b:"+x[0]]=1;});});
+/* WAIT rows are previews of a container that gets ticked at its LAST CHANCE stop,
+   so they are not part of this stop's tally. */
 r[6].forEach(function(ti){var ta=TREASURE[ti]; if(!ta)return;
-ta.e.forEach(function(x,i){out[tkey(ta.a,x,i)]=1;});});
+ta.e.forEach(function(x,i){if(x[0]==="W")return; out[tkey(ta.a,x,i)]=1;});});
 return Object.keys(out);
 }
 function sect(title,n,done,accent,tag,skey,defOpen,st,tagCol){
@@ -814,34 +821,34 @@ bossAuto.forEach(function(x){h+=bossRow(x);});
 }
 var LBL={F:["",""],W:["WAIT","var(--magicite)"],
 N:["TAKE NOW","var(--warn)"],L:["LAST CHANCE","var(--sealed)"]};
-var tc=0; r[6].forEach(function(ti){if(TREASURE[ti]) tc+=TREASURE[ti].e.length;});
-if(tc){
-var skt="r"+ri+"c";
-var td=0; r[6].forEach(function(ti){var ta=TREASURE[ti]; if(ta) ta.e.forEach(function(x,i){if(S.checked[tkey(ta.a,x,i)])td++;});});
 var tAll=[],tUrg=[];
 r[6].forEach(function(ti){var ta=TREASURE[ti]; if(!ta)return;
 ta.e.forEach(function(x,i){var k=tkey(ta.a,x,i);tAll.push(k);if(x[0]!=="W")tUrg.push(k);});});
-var allWait=tAll.length>0&&tUrg.length===0;
-var tst=stateOf(tUrg,tAll).s;
-if(allWait&&tst!==2) tst=1;
-var tUrgLeft=tUrg.filter(function(k){return !S.checked[k];}).length;
+if(tAll.length){
+var skt="r"+ri+"c";
+/* WAIT rows are listed but never counted here \u2014 the container is ticked at its LAST CHANCE stop. */
+var td=tUrg.filter(function(k){return !!S.checked[k];}).length;
+var allWait=tUrg.length===0;
+var tst=allWait?1:stateOf(tUrg,tUrg).s;
+var tUrgLeft=tUrg.length-td;
 var ttag=tst===2?"CLEARED"
 :(allWait?"ALL UPGRADE \u2014 LEAVE"
-:(tst===1?"NOTHING DUE":(tUrgLeft&&tUrgLeft<tAll.length?tUrgLeft+" DUE NOW":null)));
+:(tUrgLeft&&tUrgLeft<tUrg.length?tUrgLeft+" DUE NOW":null));
 var tcol=allWait?"var(--magicite)":"var(--sealed)";
-h+=sect("Treasure",tc,td,"var(--cyan)",ttag,skt,false,tst,tcol);
+h+=sect("Treasure",allWait?null:tUrg.length,allWait?null:td,"var(--cyan)",ttag,skt,false,tst,tcol);
 if(open[skt]) r[6].forEach(function(ti){
 var ta=TREASURE[ti]; if(!ta) return;
 if(r[6].length>1) h+='<div style="font-size:10px;color:var(--ink-dim);margin:7px 0 1px">'+esc(ta.a)+'</div>';
 if(ta.n) h+='<div class="warn">'+esc(ta.n)+'</div>';
 ta.e.forEach(function(x,i){
-var k=tkey(ta.a,x,i),on=!!S.checked[k],lb=LBL[x[0]];
-h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
-+'<span class="box">'+(on?"\u2713":"")+'</span><span>'
+var k=tkey(ta.a,x,i),on=!!S.checked[k],lb=LBL[x[0]],wait=x[0]==="W";
+h+=(wait?'<div class="item wait'+(on?" on":"")+'">'
+:'<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">')
++'<span class="box">'+(on?"\u2713":(wait?"\u2715":""))+'</span><span>'
 +(x[5]?'<span style="color:var(--rule)">\u21c4 </span>':"")+esc(x[1])
 +(x[2]?' <span style="color:var(--magicite)">\u2192 '+esc(x[2])+'</span>':"")
 +(lb[0]?' <span style="color:'+lb[1]+';font-size:9px;letter-spacing:.08em">'+lb[0]+'</span>':"")
-+'<span class="sub">'+esc(x[3])+' \u00b7 '+esc(x[4])+'</span></span></button>';
++'<span class="sub">'+esc(x[3])+' \u00b7 '+esc(x[4])+'</span></span>'+(wait?'</div>':'</button>');
 });
 });
 }
@@ -1407,17 +1414,18 @@ if(isOpen){
 h+='<div class="gbody">';
 if(g.n) h+='<div class="warn">'+esc(g.n)+'</div>';
 g.e.forEach(function(x,i){
-var k=tkey(g.a,x,i),on=!!S.checked[k],lb=LBL[x[0]];
+var k=tkey(g.a,x,i),on=!!S.checked[k],lb=LBL[x[0]],wait=x[0]==="W";
 var others=x[5]?gmap[x[5]].filter(function(a){return a!==g.a;}):[];
-h+='<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
-+'<span class="box">'+(on?"\u2713":"")+'</span><span>'
+h+=(wait?'<div class="item wait'+(on?" on":"")+'">'
+:'<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">')
++'<span class="box">'+(on?"\u2713":(wait?"\u2715":""))+'</span><span>'
 +(x[5]?'<span style="color:var(--rule)">\u21c4 </span>':"")
 +esc(x[1])
 +(x[2]?' <span style="color:var(--magicite)">\u2192 '+esc(x[2])+'</span>':"")
 +(lb[0]?' <span style="color:'+lb[1]+';font-size:9px;letter-spacing:.08em">'+lb[0]+'</span>':"")
 +'<span class="sub">'+esc(x[3])+' \u00b7 '+esc(x[4])
 +(others.length?'<br>\u21c4 same container as: '+esc(others.join(" / ")):"")
-+'</span></span></button>';
++'</span></span>'+(wait?'</div>':'</button>');
 });
 h+='</div>';
 }

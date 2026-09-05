@@ -319,6 +319,8 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
   border-left:2px solid var(--rule-dim);padding-left:9px}
 .note-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--rule);margin-top:8px}
 .note-reply{font-size:12.5px;line-height:1.5;color:var(--sealed);margin-top:8px;padding-left:10px;border-left:2px solid var(--sealed);white-space:pre-wrap}
+.note-you{font-size:12.5px;line-height:1.5;color:var(--ink);margin-top:8px;padding-left:10px;border-left:2px solid var(--warn);white-space:pre-wrap}
+.note-you-tag{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--warn);margin-bottom:2px}
 .note-acts{display:flex;gap:7px;margin-top:10px}
 .note-flash{outline:2px solid var(--warn);outline-offset:3px;border-radius:6px}
 #imgSheet{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(4,7,20,.9);cursor:zoom-out;overflow:auto;padding:12px}
@@ -380,19 +382,31 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=a3d2e33"></script>
-<script src="data/rages.js?b=a3d2e33"></script>
-<script src="data/treasure.js?b=a3d2e33"></script>
-<script src="data/gear.js?b=a3d2e33"></script>
-<script src="data/bestiary.js?b=a3d2e33"></script>
-<script src="data/roster.js?b=a3d2e33"></script>
-<script src="data/veldt.js?b=a3d2e33"></script>
-<script src="data/notereplies.js?b=a3d2e33"></script>
+<script src="data/route.js?b=16df0a0"></script>
+<script src="data/rages.js?b=16df0a0"></script>
+<script src="data/treasure.js?b=16df0a0"></script>
+<script src="data/gear.js?b=16df0a0"></script>
+<script src="data/bestiary.js?b=16df0a0"></script>
+<script src="data/roster.js?b=16df0a0"></script>
+<script src="data/veldt.js?b=16df0a0"></script>
+<script src="data/notereplies.js?b=16df0a0"></script>
 
 <script>
 "use strict";
 var KEY = "ff6pr-tracker-v1";
 var NREPLY=(typeof NOTEREPLY!=="undefined")?NOTEREPLY:{};
+/* A maintainer reply in notereplies.js is a string (legacy) or an array of
+   strings / {t,ts}. Your own follow-ups live on the note itself as n.r=[{t,ts}],
+   so they travel with saved progress and reach the maintainer through the Gist.
+   The thread is both lists merged in time order. */
+function replyThread(k,n){
+var v=NREPLY[k],out=[];
+if(v){if(!Array.isArray(v))v=[v];
+v.forEach(function(x,i){out.push(typeof x==="string"?{t:x,ts:i,who:"fix"}:{t:x.t,ts:x.ts||i,who:"fix"});});}
+((n&&n.r)||[]).forEach(function(x){if(x&&x.t)out.push({t:x.t,ts:x.ts||0,who:"you"});});
+out.sort(function(a,b){return a.ts-b.ts;});
+return out;
+}
 var GIST_KEY = "ff6pr-gist-id";
 var TOKEN_KEY = "ff6pr-gist-token";
 /* Permanent fallback so a fully wiped device (Safari "Clear website data",
@@ -783,9 +797,14 @@ var etag=en.length===0?null:(est===2?"CLEARED":(allDef?"SAFE TO DEFER":(est===1?
 var ecol=(allDef||est>=1)?"var(--sealed)":"var(--warn)";
 h+=sect("Enemies",en.length+bossAuto.length,ed+bossAuto.length,ecol,etag,ske,false,est,ecol);
 if(open[ske]){
-if(en.length && !allUrg) h+='<div class="sect-note">'
-+(allDef?'This area stays open. Leave these':'Unmarked entries stay available \u2014 leave them')
-+' until your Rages are banked, since every formation you fight crowds the Veldt.</div>';
+if(en.length && !allUrg){
+/* Name the Rages, not "your Rages" - the un-banked entries of the want-list. */
+var unb=RAGES.filter(function(r){return !S.checked["rage:"+r.n];}).map(function(r){return r.n;});
+h+='<div class="sect-note">'
++(allDef?'This area stays open. ':'Unmarked entries stay available. ')
++(unb.length?'Leave these until the Rages you still want are banked \u2014 '+esc(unb.join(", "))+' \u2014 since every formation you fight is added to the Veldt pool and lengthens those hunts.'
+:'Every wanted Rage is banked, so nothing here needs deferring \u2014 fight these whenever it suits.')
++'</div>';}
 var enemyRow=function(x){
 var k="b:"+x[0],on=!!S.checked[k],ug=isUrg(x);
 return '<button class="item'+(on?" on":"")+'" data-key="'+k+'" aria-pressed="'+on+'">'
@@ -1531,7 +1550,7 @@ ks.forEach(function(k){var n=S.notes[k];
 out.push((n.d?"[done] ":"[open] ")+(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"?"))+" — "+noteWhen(n.ts)
 +"\n  note: "+n.t
 +"\n  on:   "+(n.c||"(no context)")
-+(NREPLY[k]?"\n  fix:  "+NREPLY[k]:""));});
++replyThread(k,n).map(function(x){return "\n  "+(x.who==="fix"?"fix:  ":"you:  ")+x.t;}).join(""));});
 return out.join("\n\n");
 }
 function noteOrder(){
@@ -1607,7 +1626,8 @@ var op=ks.filter(function(k){return !S.notes[k].d;}).length;
 var h='<div class="card"><h3>How this works</h3>'
 +'<p class="p"><b>Press and hold</b> any line anywhere in the app for half a second — a walkthrough step, a checklist row, a section header, a table row — and a box opens where you can type. The line then carries a <b style="color:var(--warn)">✎</b> so you can see at a glance that you flagged it.</p>'
 +'<p class="p">Nothing you write is ever thrown away. Each note keeps a copy of the text it was attached to, so even if that line is later edited or removed, the note still shows what it was about.</p>'
-+'<p class="p">For anything that is not about one particular line — an idea, a question, something the app itself should do differently — use <b>Add a general note</b> below.</p></div>';
++'<p class="p">For anything that is not about one particular line — an idea, a question, something the app itself should do differently — use <b>Add a general note</b> below.</p>'
++'<p class="p">When a note has a <span style="color:var(--sealed)">↳ reply</span> under it, <b>Reply</b> adds your answer to that thread and moves the note back to Open, so it gets looked at again. Resolve it once you are satisfied.</p></div>';
 
 if(!ks.length){
 return h+'<div class="card"><h3>Nothing flagged yet</h3>'
@@ -1637,11 +1657,14 @@ h+='<div class="sect" style="border-left-color:'+(isDone?"var(--sealed)":"var(--
 h+='<div class="note-row'+(isDone?" done":"")+'">'
 +'<div class="note-body">'+esc(n.t)+'</div>'
 +(n.c?'<div class="note-ctx">'+esc(n.c)+'</div>':"")
-+(NREPLY[k]?'<div class="note-reply">↳ '+esc(NREPLY[k])+'</div>':"")
++replyThread(k,n).map(function(x){
+return x.who==="fix"?'<div class="note-reply">↳ '+esc(x.t)+'</div>'
+:'<div class="note-you"><span class="note-you-tag">You · '+esc(noteWhen(x.ts))+'</span>'+esc(x.t)+'</div>';}).join("")
 +'<div class="note-meta">'+esc(k.indexOf("gen:")===0?"General":(TABNAME[n.w]||n.w||"—"))+' · '+esc(noteWhen(n.ts))+'</div>'
 +'<div class="note-acts">'
 +(!isDone&&k.indexOf("gen:")!==0?'<button class="seg" type="button" data-mn="goto" data-mk="'+esc(k)+'">Go to</button>':"")
 +'<button class="seg" type="button" data-mn="edit" data-mk="'+esc(k)+'">Edit</button>'
++(replyThread(k,n).length?'<button class="seg" type="button" data-mn="reply" data-mk="'+esc(k)+'">Reply</button>':"")
 +'<button class="seg" type="button" data-mn="done" data-mk="'+esc(k)+'">'+(isDone?"Reopen":"Resolve")+'</button>'
 +'<button class="seg" type="button" data-mn="del" data-mk="'+esc(k)+'" style="color:var(--warn)">Delete</button>'
 +'</div></div>';
@@ -1716,6 +1739,7 @@ if(act==="new"){openNote("gen:"+Date.now(),"General note — not tied to any lin
 if(act==="goto"){noteJump(mk);return;}
 if(!n)return;
 if(act==="edit"){openNote(mk,n.c||"");return;}
+if(act==="reply"){openReply(mk);return;}
 if(act==="done"){n.d=n.d?0:1;n.m=Date.now();save();rerender();return;}
 if(act==="del"){if(confirm("Delete this note?")){delete S.notes[mk];save();rerender();}return;}
 return;
@@ -1792,18 +1816,35 @@ if(r){S[r.dataset.role]=r.dataset.val;save();render();}
 
 
 /* ================= notes: the sheet ================================== */
-var NOTEKEY=null,NOTECTX="";
+var NOTEKEY=null,NOTECTX="",NOTEMODE="edit";
 function openNote(k,ctx){
 if(!k)return;
-NOTEKEY=k;NOTECTX=ctx||"";
+NOTEKEY=k;NOTECTX=ctx||"";NOTEMODE="edit";
 var n=S.notes[k];
 document.getElementById("noteCtx").textContent=(n&&n.c)||NOTECTX||"(no context)";
 var ta=document.getElementById("noteText");
-ta.value=n?n.t:"";
+ta.value=n?n.t:"";ta.placeholder="What is wrong here?";
 var dn=document.getElementById("noteDone");
 dn.textContent=(n&&n.d)?"Reopen":"Resolve";
 dn.hidden=!n;
 document.getElementById("noteDel").hidden=!n;
+showNoteSheet(ta);
+}
+/* Reply mode: same sheet, but Save appends to the note's thread (n.r) instead of
+   editing its text, and the note goes back to Open so the follow-up is seen. */
+function openReply(k){
+var n=S.notes[k];if(!n)return;
+NOTEKEY=k;NOTECTX="";NOTEMODE="reply";
+var th=replyThread(k,n),last=null;
+for(var i=th.length-1;i>=0;i--){if(th[i].who==="fix"){last=th[i];break;}}
+document.getElementById("noteCtx").textContent="Replying to: "+(last?last.t:n.t);
+var ta=document.getElementById("noteText");
+ta.value="";ta.placeholder="Your reply";
+document.getElementById("noteDone").hidden=true;
+document.getElementById("noteDel").hidden=true;
+showNoteSheet(ta);
+}
+function showNoteSheet(ta){
 var sh=document.getElementById("noteSheet");
 sh.hidden=false;
 /* Force a layout flush so the transition has a start value, rather than waiting
@@ -1818,10 +1859,20 @@ var sh=document.getElementById("noteSheet");
 sh.classList.remove("show");
 try{document.getElementById("noteText").blur();}catch(e){}
 setTimeout(function(){sh.hidden=true;},180);
-NOTEKEY=null;NOTECTX="";
+NOTEKEY=null;NOTECTX="";NOTEMODE="edit";
+}
+function commitReply(){
+var k=NOTEKEY,n=S.notes[k],txt=document.getElementById("noteText").value.trim();
+if(n&&txt){
+if(!n.r)n.r=[];
+n.r.push({t:txt,ts:Date.now()});
+n.m=Date.now();n.d=0;
+}
+closeNote();save();rerender();
 }
 function commitNote(toggleDone){
 if(!NOTEKEY)return;
+if(NOTEMODE==="reply"){commitReply();return;}
 var k=NOTEKEY,txt=document.getElementById("noteText").value.trim();
 if(!txt&&!toggleDone){delete S.notes[k];}
 else if(txt){

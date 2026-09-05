@@ -7,5 +7,5 @@ var RAGES=[
 {n:"Aspiran",num:51,g:"9 / 11",a:"Gigavolt",w:"Ultros at the Opera"},
 {n:"Anguiform",num:50,g:"11",a:"Aqua Breath",w:"Cranes"},
 {n:"Gobbledygook",num:64,g:"14",a:"Vanish",w:"Number 024"},
-{n:"Intangir",num:97,g:"27",a:"immunities",w:"FC approach"}
+{n:"Intangir",num:97,g:"27",a:"immunities",w:"banked on the Veldt after the WoB sweep — any fight after"}
 ];

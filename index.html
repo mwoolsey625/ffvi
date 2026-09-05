@@ -357,6 +357,7 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
     <button role="tab" data-tab="gear" aria-selected="false">Gear</button>
     <button role="tab" data-tab="coli" aria-selected="false">Coliseum</button>
     <button role="tab" data-tab="veldt" aria-selected="false">Veldt & Rages</button>
+    <button role="tab" data-tab="skills" aria-selected="false">Lores & Dances</button>
     <button role="tab" data-tab="notes" aria-selected="false">Notes</button>
     <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
   </div>
@@ -382,14 +383,15 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=16df0a0"></script>
-<script src="data/rages.js?b=16df0a0"></script>
-<script src="data/treasure.js?b=16df0a0"></script>
-<script src="data/gear.js?b=16df0a0"></script>
-<script src="data/bestiary.js?b=16df0a0"></script>
-<script src="data/roster.js?b=16df0a0"></script>
-<script src="data/veldt.js?b=16df0a0"></script>
-<script src="data/notereplies.js?b=16df0a0"></script>
+<script src="data/route.js?b=91c6488"></script>
+<script src="data/rages.js?b=91c6488"></script>
+<script src="data/lores.js?b=91c6488"></script>
+<script src="data/treasure.js?b=91c6488"></script>
+<script src="data/gear.js?b=91c6488"></script>
+<script src="data/bestiary.js?b=91c6488"></script>
+<script src="data/roster.js?b=91c6488"></script>
+<script src="data/veldt.js?b=91c6488"></script>
+<script src="data/notereplies.js?b=91c6488"></script>
 
 <script>
 "use strict";
@@ -1253,6 +1255,59 @@ return '<div class="card"><h3>Reload app</h3>'
 +'<p class="p">A Home Screen icon can keep showing an old copy of this page even after the tracker is updated. Force refresh below to pull a fresh copy of the app itself — it does not touch your tracked progress.</p>'
 +'<button class="seg" data-act="force-refresh">Force refresh</button></div>';
 }
+function skillsHTML(){
+var h="",lo=open["skl"]===undefined?true:!!open["skl"],dn=open["skd"]===undefined?true:!!open["skd"];
+function wobTag(p){return p.indexOf("WoB ")===0?'<b style="color:var(--warn)">WoB</b>'+esc(p.slice(3)):p.indexOf("WoR ")===0?'<b style="color:var(--ink-dim)">WoR</b>'+esc(p.slice(3)):esc(p);}
+/* ---- Lores ---- */
+var got=LORES.filter(function(l){return l.s===null||!!S.checked["lore:"+l.n];}).length;
+h+='<div class="gate"><button class="gate-head" data-gate="skl" aria-expanded="'+lo+'">'
++'<span class="chev">'+(lo?"\u25BC":"\u25B6")+'</span><span class="gate-title">Lores \u2014 Strago</span>'
++'<span class="tally">'+got+'/'+LORES.length+' learned</span></button>';
+if(lo){
+h+='<div class="gbody">';
+h+='<div class="card" style="margin-top:14px"><h3>How Lores are learned</h3>'
++'<p class="p">Strago learns a Lore when <b>any enemy or ally uses it while he is in the party and alive</b>. He does not have to be the target. Gau\'s Rage, Relm\'s Sketch and Control all count \u2014 that is what the <b>(Rage)</b> and <b>(Sketch)</b> sources below mean: the monster will not use the move on its own.</p>'
++'<p class="p"><b style="color:var(--warn)">Only FORCE FIELD is permanently missable.</b> Its one source is Fiend in Kefka\'s Tower, which is fought by Party 1 (left route) or Party 3 (right route) \u2014 never Party 2. The Kefka\'s Tower gate on the Route tab carries that check.</p>'
++'<p class="p"><b>DARK FORCE in Kefka\'s Tower uses 20 of the 24</b>, so it is the clean-up stop for anything still missing. Tsunami only comes out of it through Control or Sketch, and it never uses Transfusion, Mighty Guard, Grand Delta or Force Field \u2014 those four need their own sources.</p>'
++'<p class="p"><b>Damage:</b> Grand Delta at 87 Magic is a guaranteed 9,999 at level 99 even against groups; Quasar never gets there without Hero\'s Rings. Build Strago toward Grand Delta (jinsoku).</p>'
++'<p class="p"><b style="color:var(--warn)">WoB</b> sources are early chances, not requirements \u2014 every Lore except Force Field also has a World of Ruin source. Tick a Lore when it shows in Strago\'s list.</p></div>';
+LORES.forEach(function(l){
+var free=l.s===null,k="lore:"+l.n,on=free||!!S.checked[k];
+h+='<button class="item'+(on?" on":"")+(free?" auto":"")+(l.miss&&!on?" no-hits":"")+'"'+(free?'':' data-key="'+esc(k)+'"')+' aria-pressed="'+on+'">'
++'<span class="box">'+(on?"\u2713":"")+'</span><span>'+esc(l.n)
++(l.miss?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">MISSABLE \u2014 FIEND ONLY</span>':"")
++'<span class="sub">'+esc(l.e)+' \u00b7 MP '+esc(l.mp)+'</span>'
++'<span class="sub">'+(free?'Known from the start.':l.s.map(function(x){return esc(x[0])+(x[1]!=="Enemy"?" ("+esc(x[1])+")":"")+" \u2014 "+wobTag(x[2]);}).join(" \u00b7 "))+'</span>'
++'</span></button>';
+});
+h+='</div>';
+}
+h+='</div>';
+/* ---- Dances ---- */
+var gd=DANCES.filter(function(d){return !!S.checked["dance:"+d.n];}).length;
+h+='<div class="gate"><button class="gate-head" data-gate="skd" aria-expanded="'+dn+'">'
++'<span class="chev">'+(dn?"\u25BC":"\u25B6")+'</span><span class="gate-title">Dances \u2014 Mog</span>'
++'<span class="tally">'+gd+'/'+DANCES.length+' learned</span></button>';
+if(dn){
+h+='<div class="gbody">';
+h+='<div class="card" style="margin-top:14px"><h3>How Dances are learned</h3>'
++'<p class="p">Mog learns a Dance by <b>winning one battle on the matching terrain with him in the party</b>. Eight Dances, four moves each, rolled at random until Mog is stopped (KO, Petrify, Confuse) or the battle ends.</p>'
++'<p class="p">On its own terrain a Dance succeeds every time; anywhere else it is a coin flip, and the failed half is a wasted turn.</p>'
++'<p class="p"><b style="color:var(--warn)">WATER HARMONY is the only missable Dance</b> \u2014 World of Balance Lethe River or Serpent Trench, with Mog. <b>SNOWMAN RONDO</b> is the reverse: the World of Ruin Narshe snowfield only. Everything else can be picked up whenever you are on that terrain (jinsoku).</p></div>';
+DANCES.forEach(function(d){
+var k="dance:"+d.n,on=!!S.checked[k];
+h+='<button class="item'+(on?" on":"")+(d.wob&&!on?" no-hits":"")+'" data-key="'+esc(k)+'" aria-pressed="'+on+'">'
++'<span class="box">'+(on?"\u2713":"")+'</span><span>'+esc(d.n)
++(d.wob?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">WoB ONLY \u2014 MISSABLE</span>':d.wor?' <span style="color:var(--ink-dim);font-size:9px;letter-spacing:.1em">WoR ONLY</span>':"")
++'<span class="sub">'+wobTag(d.w)+'</span>'
++'<span class="sub">'+d.m.map(function(x){return esc(x[0])+' '+esc(x[1])+' \u2014 '+esc(x[2]);}).join(" \u00b7 ")+'</span>'
++'</span></button>';
+});
+h+='</div>';
+}
+h+='</div>';
+return h;
+}
 function settingsHTML(){
 return ''
 +cloudCardHTML()
@@ -1535,7 +1590,7 @@ try{if(navigator.vibrate)navigator.vibrate(18);}catch(e){}
 openNote(el.dataset.nk,noteText(el));
 }
 var TABNAME={route:"Route",levels:"Levels",gear:"Gear",coli:"Coliseum",
-veldt:"Veldt & Rages",notes:"Route merge",settings:"Settings",mynotes:"My Notes"};
+veldt:"Veldt & Rages",skills:"Lores & Dances",notes:"Route merge",settings:"Settings",mynotes:"My Notes"};
 function noteWhen(t){
 if(!t)return "";
 var d=new Date(t);
@@ -1675,7 +1730,7 @@ function render(){
 renderHead();
 document.getElementById("view").innerHTML =
 tab==="route"?routeHTML():tab==="gear"?gearHTML():tab==="coli"?coliHTML():tab==="levels"?levelsHTML():
-tab==="veldt"?veldtHTML():tab==="settings"?settingsHTML():tab==="mynotes"?myNotesHTML():notesHTML();
+tab==="veldt"?veldtHTML():tab==="skills"?skillsHTML():tab==="settings"?settingsHTML():tab==="mynotes"?myNotesHTML():notesHTML();
 stampNotes();
 }
 function rerender(){var y=window.scrollY;render();window.scrollTo(0,y);}

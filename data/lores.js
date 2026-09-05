@@ -1,0 +1,44 @@
+/* Strago's Lores and Mog's Dances, for the Lores & Dances tab. Source: jinsoku.net
+   (Pixel Remaster) skill pages — Lore: /ff6/en/skill/lore.html, Dance:
+   /ff6/en/skill/dance.html. Lore sources are [monster, method, place]; method
+   "Enemy" means the monster uses it on its own, "Rage" / "Sketch" mean Gau or
+   Relm has to make it happen. s:null = known from the start. */
+var LORES=[
+{n:"Doom",mp:"20",e:"Inflicts Doom — the target is KO'd when the countdown reaches 0",s:[["Zombie Dragon","Rage","WoB Cave to the Sealed Gate"],["Nelapa","Enemy","WoB Floating Continent escape"],["Death Warden","Enemy","WoR Cave on the Veldt"],["Alluring Rider","Enemy","WoR Dreamscape"],["Dark Force","Enemy","WoR Kefka's Tower"],["Ahriman","Enemy","WoR Kefka's Tower"]]},
+{n:"Roulette",mp:"10",e:"Starts a roulette that KOs whichever monster or ally it lands on",s:[["Onion Knight","Sketch","WoB Magitek Research Facility"],["Nelapa","Enemy","WoB Floating Continent escape"],["Dark Force","Enemy","WoR Kefka's Tower"],["Ahriman","Rage","WoR Kefka's Tower"]]},
+{n:"Tsunami",mp:"30",e:"Water damage to all enemies (power 50)",s:[["Enuo","Rage","WoR Ancient Castle"],["Blue Dragon","Enemy","WoR Ancient Castle"],["Dark Force","Sketch or Control","WoR Kefka's Tower"],["Ultima Buster","Enemy","WoR Kefka's Tower"]]},
+{n:"Aqua Breath",mp:"22",e:"Water and wind damage to all enemies (power 71)",s:null},
+{n:"Aero",mp:"41",e:"Wind damage to all enemies (power 125)",s:[["Marchosias","Sketch","WoR Kohlingen area"],["Sprinter","Rage","WoR Narshe area"],["Dark Force","Enemy","WoR Kefka's Tower"]]},
+{n:"1000 Needles",mp:"50",e:"Fixed 1,000 damage to one enemy",s:[["Brainpan","Enemy","WoB Floating Continent"],["Face","Enemy","WoR Phoenix Cave"],["Cactuar","Enemy","WoR desert south of Maranda"],["Humbaba","Enemy","WoR Mobliz"],["Samurai Soul","Enemy","WoR Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"],["Mover","Enemy","WoR Kefka's Tower"]]},
+{n:"Mighty Guard",mp:"80",e:"Protect and Shell on all allies",s:[["Land Ray","Sketch","WoR Albrook desert"],["Mover","Enemy","WoR Kefka's Tower"]]},
+{n:"Revenge Blast",mp:"31",e:"Damage to one enemy equal to the user's max HP minus current HP",s:null},
+{n:"White Wind",mp:"45",e:"Heals all allies for the user's current HP",s:[["Venobennu","Enemy","WoB Esper Cave"],["Peeper","Enemy","WoR Solitary Island area"],["Marchosias","Enemy","WoR Kohlingen area"],["Curlax","Enemy","WoR Dreamscape"],["Dark Force","Enemy","WoR Kefka's Tower"],["Vector Lythos","Enemy","WoR Kefka's Tower"]]},
+{n:"Lv.5 Death",mp:"22",e:"Death on monsters whose level is a multiple of 5",s:[["Trapper","Enemy","WoB Magitek Research Facility"],["Apocrypha","Enemy","WoB Floating Continent"],["Devil","Enemy","WoR Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"],["Duel Armor","Enemy","WoR Kefka's Tower"],["Daedalus","Enemy","WoR Kefka's Tower"],["Death Machine","Enemy","WoR Kefka's Tower"]]},
+{n:"Lv.4 Flare",mp:"42",e:"Flare on monsters whose level is a multiple of 4 (power 66)",s:[["Trapper","Enemy","WoB Magitek Research Facility"],["Apocrypha","Enemy","WoB Floating Continent"],["Magna Roader (brown)","Rage","WoR Narshe"],["Red Dragon","Enemy","WoR Phoenix Cave"],["Devil","Enemy","WoR Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"],["Duel Armor","Enemy","WoR Kefka's Tower"]]},
+{n:"Lv.3 Confuse",mp:"28",e:"Confuse on monsters whose level is a multiple of 3",s:[["Trapper","Enemy","WoB Magitek Research Facility"],["Apocrypha","Enemy","WoB Floating Continent"],["Dante","Enemy","WoR South Figaro Cave"],["Devil","Enemy","WoR Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"]]},
+{n:"Reflect ???",mp:"0",e:"Darkness, Slow and Silence on every enemy that has Reflect up",s:[["Dullahan","Enemy","WoR Darill's Tomb"],["Dark Force","Enemy","WoR Kefka's Tower"],["Daedalus","Enemy","WoR Kefka's Tower"]]},
+{n:"Lv.? Holy",mp:"50",e:"Holy on monsters whose level is a multiple of the last digit of your gil (power 120)",s:[["Dullahan","Enemy","WoR Darill's Tomb"],["Alluring Rider","Enemy","WoR Dreamscape"],["Dark Force","Enemy","WoR Kefka's Tower"],["InnoSent","Enemy","WoR Kefka's Tower"]]},
+{n:"Traveler",mp:"play time x2",e:"Fixed damage to one enemy equal to steps taken / 32",s:[["Intangir","Sketch","WoB Triangle Island"],["Fafnir","Sketch","WoR Albrook area"],["Crawler","Sketch","WoR Maranda area"],["Tonberry","Enemy","WoR Yeti's Cave"],["Onion Dasher","Rage","WoR Yeti's Cave"],["Master Tonberry","Enemy","WoR Cave to the Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"]]},
+{n:"Force Field",mp:"24",e:"Picks one element at random and zeroes its damage for the rest of the battle",miss:1,s:[["Fiend","Enemy","WoR Kefka's Tower — Party 1 or Party 3 only, never Party 2"]]},
+{n:"Dischord",mp:"68",e:"Halves one target's level",s:[["Chaser","Enemy","WoB Magitek Research Facility (minecart)"],["Crawler","Enemy","WoR Maranda area"],["Figaro Lizard","Enemy","WoR Ancient Castle"],["Dark Force","Enemy","WoR Kefka's Tower"],["Gamma","Rage","WoR Kefka's Tower"],["Metal Hitman","Enemy","WoR Kefka's Tower"]]},
+{n:"Bad Breath",mp:"32",e:"Poison, Sleep, Confuse, Silence, Darkness and Imp on one target",s:[["Malboro","Enemy","WoR Darill's Tomb"],["Great Malboro","Enemy","WoR Kefka's Tower"],["Dark Force","Enemy","WoR Kefka's Tower"]]},
+{n:"Transfusion",mp:"1",e:"Fully restores one ally's HP and MP; the user is KO'd and leaves the battle",s:[["Intangir","Rage","WoB Triangle Island"],["Mousse","Enemy","WoR Kohlingen area"],["Junk","Enemy","WoR Kefka's Tower"]]},
+{n:"Rippler",mp:"66",e:"Swaps the target's status effects with the user's",s:[["Leap Frog","Enemy","WoR Narshe area"],["Dark Force","Enemy","WoR Kefka's Tower"]]},
+{n:"Stone",mp:"22",e:"Non-elemental damage to one or all enemies, may Confuse; 8x damage when the target's level equals the user's (power 40)",s:null},
+{n:"Quasar",mp:"50",e:"Magic-based damage to all enemies, ignores Magic Defense (power 57)",s:[["Dark Force","Enemy","WoR Kefka's Tower"],["Goddess","Enemy","WoR Kefka's Tower"]]},
+{n:"Grand Delta",mp:"64",e:"Magic-based damage to all enemies, ignores Magic Defense (power 84) — Strago's best Lore",s:[["Hidon","Enemy","WoR Ebot's Rock"]]},
+{n:"Self-Destruct",mp:"1",e:"Damage to one target equal to the user's current HP; the user is KO'd",s:[["Bandit","Rage","WoB Narshe"],["Bomb","Enemy","WoB Phantom Train"],["Grenade","Enemy","WoB forest west of the Veldt"],["Balloon","Enemy","WoB Thamasa, Burning House"],["Dark Force","Enemy","WoR Kefka's Tower"],["Junk","Enemy","WoR Kefka's Tower"]]}
+];
+/* Dances: w = where a battle has to be won with Mog in the party; m = the four
+   moves as [name, rate out of 16, effect]. wob:1 = World of Balance only,
+   wor:1 = World of Ruin only. */
+var DANCES=[
+{n:"Wind Rhapsody",w:"Plains on the world map",m:[["Wind Slash","6/16","wind damage to all enemies"],["Sunbath","6/16","heals all allies"],["Plasma","3/16","lightning damage to all enemies"],["Cockatrice","1/16","may Petrify one enemy"]]},
+{n:"Forest Nocturne",w:"Forests on the world map",m:[["Forest Healing","6/16","cures status ailments on all allies"],["Leaf Swirl","6/16","non-elemental damage to one enemy"],["Will o' the Wisp","3/16","fire damage to all enemies"],["Wombat","1/16","non-elemental damage to one enemy"]]},
+{n:"Desert Lullaby",w:"Deserts on the world map",m:[["Sandstorm","6/16","wind damage to all enemies"],["Antlion","6/16","may KO one enemy"],["Wind Slash","3/16","wind damage to all enemies"],["Meerkat","1/16","Haste on all allies"]]},
+{n:"Love Serenade",w:"Indoors — Zozo, Owzer's Mansion and the like",m:[["Will o' the Wisp","6/16","fire damage to one enemy"],["Apparition","6/16","may Confuse one enemy"],["Snare","3/16","may KO one enemy"],["Tapir","1/16","cures status ailments on all allies"]]},
+{n:"Earth Blues",w:"Mountains on the world map",m:[["Rock Slide","6/16","non-elemental magic damage to one enemy"],["Sonic Boom","6/16","cuts one enemy to 3/8 HP and inflicts Sap"],["Sunbath","3/16","heals all allies"],["Boar Brigade","1/16","non-elemental damage to one enemy"]]},
+{n:"Water Harmony",w:"WoB Lethe River or WoB Serpent Trench — the World of Balance cleanup sweep stop has the loop",wob:1,m:[["El Niño","6/16","water damage to all enemies"],["Plasma","6/16","lightning damage to one enemy"],["Apparition","3/16","may Confuse one enemy"],["Raccoon","1/16","heals and cures status ailments on all allies"]]},
+{n:"Twilight Requiem",w:"Caves",m:[["Cave In","6/16","cuts one enemy to 1/4 HP"],["Snare","6/16","may KO one enemy"],["Will o' the Wisp","3/16","fire damage to one enemy"],["Poisonous Frog","1/16","poison damage to one enemy"]]},
+{n:"Snowman Rondo",w:"WoR Narshe snowfield only — cannot be learned in the World of Balance",wor:1,m:[["Snowball","6/16","cuts one enemy to 1/2 HP"],["Avalanche","6/16","ice damage to all enemies"],["Snare","3/16","may KO one enemy"],["Arctic Hare","1/16","heals all allies"]]}
+];

@@ -383,15 +383,15 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=8e07ac1"></script>
-<script src="data/rages.js?b=8e07ac1"></script>
-<script src="data/lores.js?b=8e07ac1"></script>
-<script src="data/treasure.js?b=8e07ac1"></script>
-<script src="data/gear.js?b=8e07ac1"></script>
-<script src="data/bestiary.js?b=8e07ac1"></script>
-<script src="data/roster.js?b=8e07ac1"></script>
-<script src="data/veldt.js?b=8e07ac1"></script>
-<script src="data/notereplies.js?b=8e07ac1"></script>
+<script src="data/route.js?b=648cadd"></script>
+<script src="data/rages.js?b=648cadd"></script>
+<script src="data/lores.js?b=648cadd"></script>
+<script src="data/treasure.js?b=648cadd"></script>
+<script src="data/gear.js?b=648cadd"></script>
+<script src="data/bestiary.js?b=648cadd"></script>
+<script src="data/roster.js?b=648cadd"></script>
+<script src="data/veldt.js?b=648cadd"></script>
+<script src="data/notereplies.js?b=648cadd"></script>
 
 <script>
 "use strict";
@@ -606,7 +606,7 @@ function isMandatoryBoss(x){return x[0]>=263 && !MISSABLE[x[0]] && !RAGEWANT[x[0
    number again? If so an earlier "closes soon" stop doesn't need to panic about it. */
 function laterEnemyOccurrence(num,afterRi){
 for(var i=afterRi+1;i<ROUTE.length;i++){
-var rr=ROUTE[i];
+var rr=ROUTE[i]; if(rr[9]==="audit") continue; /* the audit re-lists everything; it never defers an earlier stop */
 for(var j=0;j<rr[5].length;j++){
 var bl=BEST[rr[5][j]]; if(!bl) continue;
 for(var k=0;k<bl.e.length;k++){ if(bl.e[k][0]===num) return true; }
@@ -619,6 +619,7 @@ return false;
    is always urgent regardless of what comes after. */
 function enemyUrgent(x,r,ri){
 if(x[0]>=263||RAGEWANT[x[0]]) return true;
+if(r[9]==="audit") return true;
 if(!MISSABLE[x[0]]&&!r[7]) return false;
 return !laterEnemyOccurrence(x[0],ri);
 }
@@ -764,18 +765,17 @@ autoRows=[
 ["Boss entries #263\u2013274 registered \u2014 mandatory ones count themselves; only Guard Leader and Hell's Rider still need a manual tick",bossDone,bossNums.length]
 ];
 }
-/* Final audit: every tracked entry outside Kefka's Tower, with the unticked ones
-   listed by location. Tower-only entries belong to the tower stops. */
+/* Final audit: one count for every tracked entry outside Kefka's Tower. The
+   Enemies section of the same stop is the clickable list. */
 if(id==="g27"){
-var seenOut={},outTotal=0,outMiss=[];
+var seenOut={},outTotal=0,outDone=0;
 BEST.forEach(function(gr){
 if(gr.loc.indexOf("Kefka's Tower")>-1) return;
 gr.e.forEach(function(x){
-if(seenOut[x[0]]) return; seenOut[x[0]]=1; outTotal++;
-if(isMandatoryBoss(x)||S.checked["b:"+x[0]]) return;
-outMiss.push("#"+x[0]+" "+String(x[1]).split(" \u2014 ")[0]+" \u2014 "+gr.loc);
+if(seenOut[x[0]]||isMandatoryBoss(x)) return; seenOut[x[0]]=1; outTotal++;
+if(S.checked["b:"+x[0]]) outDone++;
 });});
-autoRows=[["Bestiary registered everywhere outside Kefka's Tower \u2014 anything still unticked is listed here with where it lives",outTotal-outMiss.length,outTotal,outMiss]];
+autoRows=[["Bestiary registered everywhere outside Kefka's Tower \u2014 the Enemies section below is the checklist, by area",outDone,outTotal]];
 }
 if(!solo.length && !autoRows.length) return;
 var skm="r"+ri+"m"+id;
@@ -794,14 +794,13 @@ autoRows.forEach(function(a){
 var on=a[2]>0&&a[1]===a[2];
 h+='<div class="item auto'+(on?" on":"")+'"><span class="box">'+(on?"\u2713":"")+'</span><span>'+esc(a[0])
 +' <span style="color:var(--ink-dim);font-family:var(--mono);font-size:11px">'+a[1]+'/'+a[2]+'</span></span></div>';
-if(a[3]&&a[3].length&&!on){
-h+='<div style="padding:2px 0 8px 30px;font-size:11px;line-height:1.55;color:var(--ink-dim)">'
-+a[3].slice(0,80).map(esc).join('<br>')+(a[3].length>80?'<br>… and '+(a[3].length-80)+' more':'')+'</div>';
-}
 });
 }
 });
-var enAll=[]; r[5].forEach(function(bi){var bl=BEST[bi]; if(bl) bl.e.forEach(function(x){enAll.push(x);});});
+/* The audit lists every entry once, without the mandatory bosses. */
+var enAll=[],seenN={}; r[5].forEach(function(bi){var bl=BEST[bi]; if(bl) bl.e.forEach(function(x){
+if(r[9]==="audit"){ if(seenN[x[0]]||isMandatoryBoss(x)) return; seenN[x[0]]=1; }
+enAll.push(x);});});
 if(enAll.length){
 var en=enAll.filter(function(x){return !isMandatoryBoss(x);});
 var bossAuto=enAll.filter(isMandatoryBoss);
@@ -846,11 +845,20 @@ return '<div class="item auto on"><span class="box">\u2713</span>'
 +'</span></div>';
 };
 if(r[9]){
+var audit=r[9]==="audit",seenR={},hiddenAreas=0;
+if(audit) h+='<div class="sect-note">Every entry outside Kefka\u2019s Tower, grouped by where it lives \u2014 tick here as you register. An area drops off this list the moment its last entry is ticked, so what you see is what is left.</div>';
 r[5].forEach(function(bi){
 var bl=BEST[bi]; if(!bl||!bl.e.length) return;
+var rows=bl.e;
+if(audit){
+rows=rows.filter(function(x){ if(isMandatoryBoss(x)||seenR[x[0]]) return false; seenR[x[0]]=1; return true; });
+if(!rows.length) return;
+if(rows.every(function(x){return !!S.checked["b:"+x[0]];})){ hiddenAreas++; return; }
+}
 h+='<div style="font-size:10px;color:var(--ink-dim);margin:12px 0 1px;text-transform:uppercase;letter-spacing:.08em">'+esc(bl.loc)+'</div>';
-bl.e.forEach(function(x){h+=isMandatoryBoss(x)?bossRow(x):enemyRow(x);});
+rows.forEach(function(x){h+=isMandatoryBoss(x)?bossRow(x):enemyRow(x);});
 });
+if(audit&&hiddenAreas) h+='<div class="sect-note">'+hiddenAreas+' area'+(hiddenAreas>1?"s":"")+' fully registered and folded away \u2014 still listed on the Bestiary tab.</div>';
 } else {
 en.forEach(function(x){h+=enemyRow(x);});
 bossAuto.forEach(function(x){h+=bossRow(x);});

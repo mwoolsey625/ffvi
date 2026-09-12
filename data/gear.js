@@ -48,4 +48,6 @@ var COLI=[
 {w:"Zephyr Cloak",bet:"Air Anchor",vs:"Primeval Dragon",hp:"10,050",pri:3,s:"Its Meteor will kill almost anyone in one hit. Use Setzer with Fixed Dice + Master's Scroll, or Mog with Dragoon Boots + Dragon Horn, with Fire protection.",n:"Air Anchor comes from betting a Cursed Ring vs Muud Suud."},
 {w:"Berserker Ring",bet:"Blizzard Orb",vs:"Weredragon",hp:"3,000",pri:3,s:"Reflect Ring wins fast \u2014 its Death spells bounce straight back.",n:"Umaro's relic. Bets both ways between Blizzard Orb and Berserker Ring, so you can convert whichever you have spare."}
 ];
-var MP={Terra:3,Celes:3,Mog:3,Relm:3,Locke:4,Edgar:4,Shadow:4,Gau:4,Setzer:4,Strago:4,Sabin:5,Cyan:5};
+/* Natural MP at Lv99 with no esper bonus (jinsoku Pixel Remaster character pages), and the Crusader (+50% MP) level-ups needed to reach 999: one at 98 -> 99 for everyone short of it, except Sabin, who needs two (97 -> 99). Absent = none needed. */
+var MP99={Terra:999,Locke:996,Edgar:995,Sabin:992,Celes:999,Shadow:995,Cyan:994,Gau:999,Setzer:998,Mog:999,Strago:999,Relm:999};
+var MP={Locke:1,Edgar:1,Sabin:2,Shadow:1,Cyan:1,Setzer:1};

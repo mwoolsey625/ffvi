@@ -383,15 +383,15 @@ tr.hasnote.note-done>td:first-child::after{color:var(--ink-dim);opacity:.55}
 <div id="build" style="margin-top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rule-dim)">build d6e0b71</div>
 
 <!-- Data arrays — must load before the main script below -->
-<script src="data/route.js?b=2dce241"></script>
-<script src="data/rages.js?b=2dce241"></script>
-<script src="data/lores.js?b=2dce241"></script>
-<script src="data/treasure.js?b=2dce241"></script>
-<script src="data/gear.js?b=2dce241"></script>
-<script src="data/bestiary.js?b=2dce241"></script>
-<script src="data/roster.js?b=2dce241"></script>
-<script src="data/veldt.js?b=2dce241"></script>
-<script src="data/notereplies.js?b=2dce241"></script>
+<script src="data/route.js?b=b9a6d5e"></script>
+<script src="data/rages.js?b=b9a6d5e"></script>
+<script src="data/lores.js?b=b9a6d5e"></script>
+<script src="data/treasure.js?b=b9a6d5e"></script>
+<script src="data/gear.js?b=b9a6d5e"></script>
+<script src="data/bestiary.js?b=b9a6d5e"></script>
+<script src="data/roster.js?b=b9a6d5e"></script>
+<script src="data/veldt.js?b=b9a6d5e"></script>
+<script src="data/notereplies.js?b=b9a6d5e"></script>
 
 <script>
 "use strict";
@@ -1035,7 +1035,8 @@ var h='<div class="card"><h3>How new party members get their level</h3>'
 +'<p class="p">A level gained this way comes with <b>no esper equipped</b>, so it is wasted next to a level earned in battle with the right stat esper on. That is why this route holds everyone — Terra included — at their join level until the whole World of Balance roster has joined, rather than grinding piecemeal.</p>'
 +'<p class="p"><b>Guests don\'t count.</b> Banon and Leo are excluded from the average entirely, which is why Banon can be safely power-levelled solo on the Lethe River without affecting anyone who joins later.</p>'
 +'<p class="p"><b>Leaped-away characters don\'t count either.</b> Gau sitting on the Veldt is excluded from the average — this is how his Esper Cave climb to 26 stays safe: level him, Leap him away, then recruit whoever is next.</p>'
-+'<p class="p">Once the roster is complete: a lone Fossil Dragon near Kohlingen is a good spot to solo-grind a single character (Locke with Bismarck for +2 Strength, for instance) one level at a time.</p></div>'
++'<p class="p">Once the roster is complete: a lone Fossil Dragon near Kohlingen is a good spot to solo-grind a single character (Locke with Bismarck for +2 Strength, for instance) one level at a time.</p>'
++'<p class="p"><b>In the World of Ruin the hold ends at the Phoenix Cave.</b> Locke is the last pickup who takes esper bonuses (Gogo and Umaro take none), so once he has rejoined, level everyone freely with their stat esper on. Only two windows are timed from there: Bahamut\'s three HP levels at 69–71, so beat Deathgaze before anyone reaches 68, and Crusader\'s last level or two at 98–99 for the six who need it. Crusader arrives from Skull Dragon inside Kefka\'s Tower, so hold those six at 98 (Sabin 97) until it does.</p></div>'
 
 +'<div class="card"><h3 style="color:var(--warn)">Four characters should never learn a spell</h3>'
 +'<p class="p">Coliseum battles are auto-battle: your character picks a command at RANDOM each turn. Every spell you teach adds an option you did not want, and dilutes the ones you did.</p>'
@@ -1064,10 +1065,10 @@ h+='</div>';
 });
 h+='</div>';
 h+='<div class="card"><h3>Windows</h3>'
-+'<p class="p"><b>HP — Bahamut (+50%).</b> Equip after gaining 68, remove after gaining 71. Three levels.</p>'
-+'<p class="p"><b>MP — Crusader (+50%).</b> Equip after gaining 47, remove after gaining 50. Extra levels sit on either side.</p>'
++'<p class="p"><b>HP — Bahamut (+50%).</b> Equip after gaining 68, remove after gaining 71. Three levels — jinsoku\'s Pixel Remaster pages say any three between 65 and 72 work, for every character. Red Cap (+25% HP) gets Locke, Sabin, Shadow and Cyan to 9,999 without spending them.</p>'
++'<p class="p"><b>MP — Crusader (+50%).</b> Six characters fall short of 999 on their own (jinsoku PR pages): Locke, Edgar, Shadow, Cyan and Setzer need ONE Crusader level, 98 → 99; Sabin needs TWO, 97 → 99. Terra, Celes, Gau, Mog, Strago and Relm reach 999 with nothing. Crusader comes from Skull Dragon inside Kefka\'s Tower, so hold those six at 98 (Sabin 97) until you have it — or skip it, since Celestriad makes every spell cost 1 MP.</p>'
 +'<p class="p"><b>Combat stats are +2 per level and hard-cap at 128.</b> Swap espers the moment one caps — further levels under it are wasted.</p></div>';
-h+='<table><thead><tr><th>Character</th><th>Stat</th><th>Crusader</th><th>Bahamut</th></tr></thead><tbody>';
+h+='<table><thead><tr><th>Character</th><th>Stat</th><th>Crusader (MP)</th><th>Bahamut (HP)</th></tr></thead><tbody>';
 ROSTER.forEach(function(c){
 var dual=c.stat==="DUAL";
 var st=c.stat==="role-terra"?S.terra:c.stat==="role-celes"?S.celes:dual?"Str + Mag":c.stat;
@@ -1075,12 +1076,13 @@ h+='<tr><td class="nm">'+esc(c.name)
 +(c.mf?' <span style="color:var(--warn);font-size:9px;letter-spacing:.1em">NO MAGIC</span>':"")
 +(c.note?'<span class="sub">'+esc(c.note)+'</span>':"")+'</td>';
 h+='<td class="'+(dual?"dual":"")+'">'+esc(st)+'</td>';
-h+='<td class="'+(dual?"skip":"")+'">'+(dual?"skip":MP[c.name]+" lv")+'</td>';
+var mpn=MP[c.name]||0;
+h+='<td>'+(mpn?(99-mpn)+'–99 ('+mpn+' lv)':'none')+'<span class="sub">'+MP99[c.name]+' MP at 99 unaided</span></td>';
 h+='<td class="'+(dual?"skip":"")+'">'+(dual?"skip":"69–71")+'</td></tr>';
 });
 h+='</tbody></table>';
 h+='<div class="card" style="margin-top:14px"><h3>Why Gau skips</h3>'
-+'<p class="p">Dual-capping needs roughly 99 levels against his ~92. HP/MP maxing would cost another seven, so it is the first thing to cut. Expect to land slightly short on one side — the route commits his first ~19 levels to Zona Seeker, so Strength is the backfill.</p>'
++'<p class="p">Dual-capping needs roughly 99 levels against his ~92. His MP reaches 999 on its own, so the only HP/MP cost would be Bahamut\'s three levels — still the first thing to cut. Expect to land slightly short on one side — the route commits his first ~19 levels to Zona Seeker, so Strength is the backfill.</p>'
 +'<p class="p">Everyone else has 37–52 spare levels after capping their primary. For them the HP and MP windows are free.</p></div>';
 return h;
 }
@@ -1383,22 +1385,21 @@ return ''
 +'<li>Strength +2 — Bismarck, Raiden</li><li>Magic +2 — Zona Seeker, Valigarmanda</li>'
 +'<li>Stamina +2 — Golem, Lakshmi</li><li>Speed +2 — Odin</li></ul>'
 +'<h4>The cost</h4>'
-+'<p>Three Bahamut levels for HP, plus three to five Crusader levels for MP depending on character. Total <code>6–8 levels</code>, or <code>12–16</code> forgone points of Strength or Magic.</p>'
++'<p>Three Bahamut levels for HP, plus one Crusader level for MP — two for Sabin, none for Terra, Celes, Gau, Mog, Strago or Relm. Total <code>3–5 levels</code>, or <code>6–10</code> forgone points of Strength or Magic.</p>'
 +'<h4>Does it matter?</h4>'
-+'<p><b>Single-stat build: no.</b> You have roughly 90–94 level-ups. Capping one stat from a typical base costs <code>(128 − base) ÷ 2 ≈ 42–53</code>, leaving 37–52 spare. Six to eight of those is nothing. Take the HP and MP.</p>'
-+'<p><b>Dual-stat build: decisive.</b> Two caps need about <code>94</code> levels against a <code>90–94</code> budget — already marginal before spending anything. Adding 6–8 puts it clearly out of reach.</p>'
++'<p><b>Single-stat build: no.</b> You have roughly 90–94 level-ups. Capping one stat from a typical base costs <code>(128 − base) ÷ 2 ≈ 42–53</code>, leaving 37–52 spare. Three to five of those is nothing. Take the HP and MP.</p>'
++'<p><b>Dual-stat build: decisive.</b> Two caps need about <code>94</code> levels against a <code>90–94</code> budget — already marginal before spending anything. Adding even three puts it clearly out of reach.</p>'
 +'<p>Gau is the only character the guide marks as needing both, which is why he is the only one skipping HP/MP here.</p>'
 +'<h4>Climb order</h4>'
-+'<ul><li>6 → ~47 — primary stat esper, watch the 128 cap</li>'
-+'<li>48 → 50 — Crusader, plus extra levels for anyone needing 4 or 5</li>'
-+'<li>51 → 68 — back to primary, or start a second stat if capped</li>'
++'<ul><li>6 → 68 — primary stat esper, watch the 128 cap and move to a second stat the moment it caps</li>'
 +'<li>69 → 71 — Bahamut</li>'
-+'<li>72 → 99 — secondary stat, then Speed/Stamina dumping</li></ul>'
++'<li>72 → 97 — secondary stat, then Speed/Stamina dumping</li>'
++'<li>98 → 99 — Crusader for Locke, Edgar, Shadow, Cyan and Setzer (Sabin from 97). Everyone else keeps dumping</li></ul>'
++'<h4>Where the windows come from</h4>'
++'<p>jinsoku\'s Pixel Remaster character pages: any three Bahamut levels between 65 and 72 reach 9,999 HP for every character, so 69–71 is safe. Natural Lv99 MP is 999 for Terra, Celes, Gau, Mog, Strago and Relm; Locke 996, Edgar 995, Sabin 992, Shadow 995, Cyan 994, Setzer 998. One Crusader level at 98 → 99 closes each gap except Sabin\'s, which takes two (97 → 99). These replace the earlier Fandom-derived counts, which the community already held to be wrong.</p>'
 +'<h4 class="flag">Still unverified</h4>'
 +'<ul>'
-+'<li><b>Per-character base stats.</b> Confirmed only for Relm (Vig 26 / Spd 34 / Sta 22 / Mag 44) and Mog (29 / 36 / 26 / 35), from a PlayStation-era guide. The level maths above is therefore approximate to about ±3 levels — not precise enough to settle a marginal dual-cap.</li>'
-+'<li><b>Per-character HP growth curves.</b> Each character has their own, so the best three-level Bahamut window may not be 69–71 for everyone. That changes how much HP those levels yield, not whether to spend them. Community consensus also holds the Fandom wiki\'s MP figures are wrong — cross-check.</li>'
-+'</ul>'
++'<li><b>Per-character base stats.</b> Confirmed only for Relm (Vig 26 / Spd 34 / Sta 22 / Mag 44) and Mog (29 / 36 / 26 / 35), from a PlayStation-era guide. The level maths above is therefore approximate to about ±3 levels — not precise enough to settle a marginal dual-cap.</li>'+'</ul>'
 +'</div></details>'
 +'<details><summary>Treasure \u2014 how it works</summary><div class="doc">'
 +'<h4>Waiting never costs the achievement</h4>'
